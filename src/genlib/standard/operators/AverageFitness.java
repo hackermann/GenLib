@@ -30,8 +30,8 @@ import genlib.abstractrepresentation.FitnessOp;
 import genlib.abstractrepresentation.GenInstance;
 import genlib.abstractrepresentation.GenObject;
 import genlib.abstractrepresentation.GenRepresentation;
-import genlib.standard.representations.BinaryStaticLength;
-import genlib.standard.representations.BinaryStaticLengthInstance;
+import genlib.standard.representations.AnyTypeStaticLength;
+import genlib.standard.representations.AnyTypeStaticLength.AnyTypeStaticLengthInstance;
 import genlib.utils.Utils;
 import java.util.List;
 
@@ -45,16 +45,21 @@ public class AverageFitness extends GenObject implements FitnessOp {
     @Override
     public double fitnessOp(GenInstance input, AlgorithmStep step) {
         double ret = 0;
-        boolean [] array = ((BinaryStaticLengthInstance)input).getArray();
+        /*boolean [] array = ((BinaryStaticLengthInstance)input).getArray();
         for (int i=0; i<array.length; i++)
             if (array[i])
-                ret++;
-        return ret / array.length;
+                ret++;*/
+        double [] array = ((AnyTypeStaticLengthInstance)input).getDoubleArray();
+        for (int i=0; i<array.length; i++)
+            ret += array[i]/array.length;
+        return ret;
+        //return ret / array.length;
     }
 
     @Override
     public boolean isCompatible(GenRepresentation representation) {
-        return representation instanceof BinaryStaticLength;
+        //return representation instanceof BinaryStaticLength;
+        return representation instanceof AnyTypeStaticLength;
     }
 
     @Override

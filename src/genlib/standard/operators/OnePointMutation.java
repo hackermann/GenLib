@@ -30,8 +30,8 @@ import genlib.abstractrepresentation.GenInstance;
 import genlib.abstractrepresentation.GenObject;
 import genlib.abstractrepresentation.GenRepresentation;
 import genlib.abstractrepresentation.MutationOp;
-import genlib.standard.representations.BinaryStaticLength;
-import genlib.standard.representations.BinaryStaticLengthInstance;
+import genlib.standard.representations.AnyTypeStaticLength;
+import genlib.standard.representations.AnyTypeStaticLength.AnyTypeStaticLengthInstance;
 import genlib.utils.Utils;
 import java.util.List;
 
@@ -44,15 +44,31 @@ public class OnePointMutation extends GenObject implements MutationOp {
 
     @Override
     public GenInstance mutationOp(GenInstance input, AlgorithmStep step) {
-        boolean [] array = ((BinaryStaticLengthInstance)input).getArray();
+        AnyTypeStaticLengthInstance instance = ((AnyTypeStaticLengthInstance)input);
+        AnyTypeStaticLength representation = (AnyTypeStaticLength)instance.getRepresentation();
+        if (representation.isLongType()) {
+            long [] array = instance.getLongArray();
+            int index = step.getRandom().nextInt(array.length);
+            long newValue = array[index];
+            for (int i=0; i<16 && newValue == array[index]; i++)
+                newValue = representation.getRandomLong(step.getRandom());
+            array[index] = newValue;
+            return representation.instantiateFromLongs(array);
+        } else {
+            double [] array = instance.getDoubleArray();
+            int index = step.getRandom().nextInt(array.length);
+            array[index] = representation.getRandomDouble(step.getRandom());
+            return representation.instantiateFromDoubles(array);
+        }
+        /*boolean [] array = ((BinaryStaticLengthInstance)input).getArray();
         int index = step.getRandom().nextInt(array.length);
         array[index] = !array[index];
-        return new BinaryStaticLengthInstance((BinaryStaticLength)input.getRepresentation(), array);
+        return new BinaryStaticLengthInstance((BinaryStaticLength)input.getRepresentation(), array);*/
     }
 
     @Override
     public boolean isCompatible(GenRepresentation representation) {
-        return representation instanceof BinaryStaticLength;
+        return representation instanceof AnyTypeStaticLength;
     }
 
     @Override

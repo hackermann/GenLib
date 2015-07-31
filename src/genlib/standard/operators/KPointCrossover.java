@@ -30,8 +30,8 @@ import genlib.abstractrepresentation.GenInstance;
 import genlib.abstractrepresentation.GenObject;
 import genlib.abstractrepresentation.GenRepresentation;
 import genlib.abstractrepresentation.RecombinationOp;
-import genlib.standard.representations.BinaryStaticLength;
-import genlib.standard.representations.BinaryStaticLengthInstance;
+import genlib.standard.representations.AnyTypeStaticLength;
+import genlib.standard.representations.AnyTypeStaticLength.AnyTypeStaticLengthInstance;
 import genlib.utils.Utils;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -66,7 +66,7 @@ public class KPointCrossover extends GenObject implements RecombinationOp {
 
     @Override
     public GenInstance[] recombinationOp(GenInstance[] input, AlgorithmStep step, int outputSize) {
-        if (input.length == 1)
+        /*if (input.length == 1)
             return input;
         else {
             BinaryStaticLength representation = ((BinaryStaticLength)((BinaryStaticLengthInstance)input[0]).getRepresentation());
@@ -88,6 +88,38 @@ public class KPointCrossover extends GenObject implements RecombinationOp {
                 result[i] = ((BinaryStaticLengthInstance)input[(odd ? 1 : 0)]).isSet(i);
             }
             return new GenInstance[] {new BinaryStaticLengthInstance(representation, result)};
+        }*/
+
+        if (input.length == 1)
+            return input;
+        else {
+            AnyTypeStaticLength representation = ((AnyTypeStaticLength)((AnyTypeStaticLengthInstance)input[0]).getRepresentation());
+            int length = representation.getLength();
+
+            List <Integer> crossoverPoints = new ArrayList(k);
+            for (int i=0; i<k; i++)
+                crossoverPoints.add(step.getRandom().nextInt( length ));
+            Collections.sort(crossoverPoints);
+
+            long [] resultLong = null;
+            double [] resultDouble = null;
+            if (representation.isLongType())
+                resultLong = new long[length];
+            else
+                resultDouble = new double[length];
+            boolean odd = false;
+            crossoverPoints.add(-1);
+            for (int i=0; i<length; i++) {
+                while (crossoverPoints.get(0) == i) {
+                    odd = !odd;
+                    crossoverPoints.remove(0);
+                }
+                if (representation.isLongType())
+                    resultLong[i] = ((AnyTypeStaticLengthInstance)input[(odd ? 1 : 0)]).getLongValue(i);
+                else
+                    resultDouble[i] = ((AnyTypeStaticLengthInstance)input[(odd ? 1 : 0)]).getDoubleValue(i);
+            }
+            return new GenInstance[] { representation.isLongType() ? representation.instantiateFromLongs(resultLong) : representation.instantiateFromDoubles(resultDouble)};
         }
     }
 
@@ -103,7 +135,7 @@ public class KPointCrossover extends GenObject implements RecombinationOp {
 
     @Override
     public boolean isCompatible(GenRepresentation representation) {
-        return representation instanceof BinaryStaticLength;
+        return representation instanceof AnyTypeStaticLength;
     }
 
     @Override

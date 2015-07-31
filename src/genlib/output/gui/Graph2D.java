@@ -26,16 +26,21 @@ package genlib.output.gui;
 
 import genlib.abstractrepresentation.GenObject;
 import genlib.utils.Exceptions.GeneticRuntimeException;
+import genlib.utils.MergeOperator;
 import genlib.utils.Utils;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
@@ -48,6 +53,7 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.data.Range;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultIntervalCategoryDataset;
 import org.jfree.data.xy.XYSeries;
@@ -89,7 +95,7 @@ public class Graph2D extends ApplicationFrame {
         if (plot instanceof Plot2DDiscreteX)
             return open(PlotCollection.createDiscretePointsChart(plot.title, xAxisName, yAxisName, (Plot2DDiscreteX)plot));
         else
-            return open(PlotCollection.createContinuousPointsChart(plot.title, xAxisName, yAxisName, (Plot2DContinuosX)plot));
+            return open(PlotCollection.createContinuousPointsChart(plot.title, xAxisName, yAxisName, (Plot2DContinuousX)plot));
     }
 
     /**
@@ -222,7 +228,7 @@ public class Graph2D extends ApplicationFrame {
         /**
          * all the non-discrete plots
          */
-        protected final Plot2DContinuosX [] plots2DContinuosX;
+        protected final Plot2DContinuousX [] plots2DContinuousX;
 
         /**
          * the x-axis and y-axis can be converted to integer-values only
@@ -240,18 +246,18 @@ public class Graph2D extends ApplicationFrame {
          * @param _xAxisDiscreteInts the x-axis can be converted to integer-values only
          * @param _yAxisDiscreteInts the y-axis can be converted to integer-values only
          * @param _plots2DDiscreteX all the discrete plots
-         * @param _plots2DContinuosX all the non-discrete plots
+         * @param _plots2DContinuousX all the non-discrete plots
          * @throws IllegalArgumentException if we have 0 plots
          * @throws NullPointerException if title, x-axis-name or y-axis-name is null
          */
-        private PlotCollection (Type _type, String _title, String _xAxis, String _yAxis, double _valueForMissingData, boolean _xAxisDiscreteInts, boolean _yAxisDiscreteInts, Plot2DDiscreteX [] _plots2DDiscreteX, Plot2DContinuosX [] _plots2DContinuosX) {
+        private PlotCollection (Type _type, String _title, String _xAxis, String _yAxis, double _valueForMissingData, boolean _xAxisDiscreteInts, boolean _yAxisDiscreteInts, Plot2DDiscreteX [] _plots2DDiscreteX, Plot2DContinuousX [] _plots2DContinuousX) {
             type = _type;
             title = _title;
             xAxis = _xAxis;
             yAxis = _yAxis;
             valueForMissingData = _valueForMissingData;
             plots2DDiscreteX = _plots2DDiscreteX;
-            plots2DContinuosX = _plots2DContinuosX;
+            plots2DContinuousX = _plots2DContinuousX;
             xAxisDiscreteInts = _xAxisDiscreteInts;
             yAxisDiscreteInts = _yAxisDiscreteInts;
 
@@ -265,14 +271,40 @@ public class Graph2D extends ApplicationFrame {
             if (plots2DDiscreteX != null) {
                 if (plots2DDiscreteX.length == 0)
                     throw new IllegalArgumentException("there has to be at least 1 plot.");
-                for (Plot plot : plots2DDiscreteX)
-                    plot.finish();
+
+                //every title is just allowed one time
+                Set <String> titlesInUse = new HashSet();
+                for (int i=0; i<plots2DDiscreteX.length; i++) {
+                    String title = plots2DDiscreteX[i].getTitle();
+                    if (titlesInUse.contains(title))
+                        for (int j=2; true; j++)
+                            if (!titlesInUse.contains(title + " (" + j + ")")) {
+                                plots2DDiscreteX[i] = new Plot2DDiscreteX(plots2DDiscreteX[i], title + " (" + j + ")");
+                                break;
+                            }
+
+                    titlesInUse.add(plots2DDiscreteX[i].getTitle());
+                    plots2DDiscreteX[i].finish();
+                }
             }
-            if (plots2DContinuosX != null) {
-                if (plots2DContinuosX.length == 0)
+            if (plots2DContinuousX != null) {
+                if (plots2DContinuousX.length == 0)
                     throw new IllegalArgumentException("there has to be at least 1 plot.");
-                for (Plot plot : plots2DContinuosX)
-                    plot.finish();
+
+                //every title is just allowed one time
+                Set <String> titlesInUse = new HashSet();
+                for (int i=0; i<plots2DContinuousX.length; i++) {
+                    String title = plots2DContinuousX[i].getTitle();
+                    if (titlesInUse.contains(title))
+                        for (int j=2; true; j++)
+                            if (!titlesInUse.contains(title + " (" + j + ")")) {
+                                plots2DContinuousX[i] = new Plot2DContinuousX(plots2DContinuousX[i], title + " (" + j + ")");
+                                break;
+                            }
+
+                    titlesInUse.add(plots2DContinuousX[i].getTitle());
+                    plots2DContinuousX[i].finish();
+                }
             }
         }
 
@@ -287,7 +319,7 @@ public class Graph2D extends ApplicationFrame {
          * @throws IllegalArgumentException if we have 0 plots
          * @throws NullPointerException if title, x-axis-name or y-axis-name is null
          */
-        public static PlotCollection createContinuousLineChart (String title, String xAxis, String yAxis, Plot2DContinuosX ... plots) {
+        public static PlotCollection createContinuousLineChart (String title, String xAxis, String yAxis, Plot2DContinuousX ... plots) {
             return new PlotCollection(Type.JustLines, title, xAxis, yAxis, -1.0, false, false, null, plots);
         }
 
@@ -302,7 +334,7 @@ public class Graph2D extends ApplicationFrame {
          * @throws IllegalArgumentException if we have 0 plots
          * @throws NullPointerException if title, x-axis-name or y-axis-name is null
          */
-        public static PlotCollection createContinuousPointsChart (String title, String xAxis, String yAxis, Plot2DContinuosX ... plots) {
+        public static PlotCollection createContinuousPointsChart (String title, String xAxis, String yAxis, Plot2DContinuousX ... plots) {
             return new PlotCollection(Type.JustPoints, title, xAxis, yAxis, -1.0, false, false, null, plots);
         }
 
@@ -317,7 +349,7 @@ public class Graph2D extends ApplicationFrame {
          * @throws IllegalArgumentException if we have 0 plots
          * @throws NullPointerException if title, x-axis-name or y-axis-name is null
          */
-        public static PlotCollection createContinuousLineAndPointsChart (String title, String xAxis, String yAxis, Plot2DContinuosX ... plots) {
+        public static PlotCollection createContinuousLineAndPointsChart (String title, String xAxis, String yAxis, Plot2DContinuousX ... plots) {
             return new PlotCollection(Type.LineAndPoints, title, xAxis, yAxis, -1.0, false, false, null, plots);
         }
 
@@ -394,7 +426,7 @@ public class Graph2D extends ApplicationFrame {
          * @throws IllegalArgumentException if we have 0 plots
          * @throws NullPointerException if title, x-axis-name or y-axis-name is null
          */
-        public static PlotCollection createContinuousLineChart (String title, String xAxis, String yAxis, boolean xAxisDiscreteInts, boolean yAxisDiscreteInts, Plot2DContinuosX ... plots) {
+        public static PlotCollection createContinuousLineChart (String title, String xAxis, String yAxis, boolean xAxisDiscreteInts, boolean yAxisDiscreteInts, Plot2DContinuousX ... plots) {
             return new PlotCollection(Type.JustLines, title, xAxis, yAxis, -1.0, xAxisDiscreteInts, yAxisDiscreteInts, null, plots);
         }
 
@@ -411,7 +443,7 @@ public class Graph2D extends ApplicationFrame {
          * @throws IllegalArgumentException if we have 0 plots
          * @throws NullPointerException if title, x-axis-name or y-axis-name is null
          */
-        public static PlotCollection createContinuousPointsChart (String title, String xAxis, String yAxis, boolean xAxisDiscreteInts, boolean yAxisDiscreteInts, Plot2DContinuosX ... plots) {
+        public static PlotCollection createContinuousPointsChart (String title, String xAxis, String yAxis, boolean xAxisDiscreteInts, boolean yAxisDiscreteInts, Plot2DContinuousX ... plots) {
             return new PlotCollection(Type.JustPoints, title, xAxis, yAxis, -1.0, xAxisDiscreteInts, yAxisDiscreteInts, null, plots);
         }
 
@@ -428,7 +460,7 @@ public class Graph2D extends ApplicationFrame {
          * @throws IllegalArgumentException if we have 0 plots
          * @throws NullPointerException if title, x-axis-name or y-axis-name is null
          */
-        public static PlotCollection createContinuousLineAndPointsChart (String title, String xAxis, String yAxis, boolean xAxisDiscreteInts, boolean yAxisDiscreteInts, Plot2DContinuosX ... plots) {
+        public static PlotCollection createContinuousLineAndPointsChart (String title, String xAxis, String yAxis, boolean xAxisDiscreteInts, boolean yAxisDiscreteInts, Plot2DContinuousX ... plots) {
             return new PlotCollection(Type.LineAndPoints, title, xAxis, yAxis, -1.0, xAxisDiscreteInts, yAxisDiscreteInts, null, plots);
         }
 
@@ -532,12 +564,12 @@ public class Graph2D extends ApplicationFrame {
 
             JFreeChart chart = null;
 
-            //even if the continous and discrete graphs have many similiarities,
+            //even if the continuous and discrete graphs have many similiarities,
             //the differences are too large - so we have two complete case-handlings
-            if (plots2DContinuosX != null) {
+            if (plots2DContinuousX != null) {
 
                 XYSeriesCollection seriesCollection = new XYSeriesCollection();
-                for (Plot2DContinuosX plot : plots2DContinuosX)
+                for (Plot2DContinuousX plot : plots2DContinuousX)
                     seriesCollection.addSeries(plot.getGraphData());
 
                 //the line / points / line-and-points graphs are in general the same graph with a different option set
@@ -550,7 +582,7 @@ public class Graph2D extends ApplicationFrame {
 
                 //set the lines / points visible or not
                 XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
-                for (int i=0; i<plots2DContinuosX.length; i++) {
+                for (int i=0; i<plots2DContinuousX.length; i++) {
                     renderer.setSeriesLinesVisible(i, hasLines());
                     renderer.setSeriesShapesVisible(i, hasPoints());
                 }
@@ -585,6 +617,7 @@ public class Graph2D extends ApplicationFrame {
                 //you can imagine the start- and end-values as the start and the end of bars in a bar-chart
                 Number [][] startValues = new Number[plots2DDiscreteX.length][plotKeys.length];
                 Number [][] endValues = new Number[plots2DDiscreteX.length][plotKeys.length];
+
                 for (int i=0; i<plots2DDiscreteX.length; i++ ) {
                     Arrays.fill(startValues[i], 0);
                     Arrays.fill(endValues[i], valueForMissingData);
@@ -598,7 +631,16 @@ public class Graph2D extends ApplicationFrame {
                 }
 
                 //the data-representation for JFreeChart-Library
-                CategoryDataset dataSet = new DefaultIntervalCategoryDataset(plotTitles, plotKeys, startValues, endValues);
+                String [] formattedPlotKeys = new String [plotKeys.length];
+                for (int i=0; i<plotKeys.length; i++) {
+                    if (plotKeys[i] instanceof Double)
+                        formattedPlotKeys[i] = Utils.doubleToCompactStr((Double)plotKeys[i]);
+                    else if (plotKeys[i] instanceof Float)
+                        formattedPlotKeys[i] = Utils.doubleToCompactStr((Float)plotKeys[i]);
+                    else
+                        formattedPlotKeys[i] = plotKeys[i].toString();
+                }
+                CategoryDataset dataSet = new DefaultIntervalCategoryDataset(plotTitles, formattedPlotKeys, startValues, endValues);
 
                 //the bar-chart is a different chart-type
                 if (type == Type.BarCharts)
@@ -625,6 +667,18 @@ public class Graph2D extends ApplicationFrame {
                 if (yAxisDiscreteInts)
                     ((NumberAxis)plot.getRangeAxis()).setStandardTickUnits(NumberAxis.createIntegerTickUnits());
 
+                //cause of a bug in the JFreeChart-Libray (at least I think it is a bug ..)
+                //the range of the y-axis has to be specified manually
+                double highestY = Double.NEGATIVE_INFINITY, lowestY = Double.POSITIVE_INFINITY;
+                for (int i=0; i<plots2DDiscreteX.length; i++ )
+                    for (Plot2DDiscreteX.Pt pt : plots2DDiscreteX[i].pts) {
+                        if (pt.y > highestY)
+                            highestY = pt.y;
+                        if (pt.y < lowestY)
+                            lowestY = pt.y;
+                    }
+                ((NumberAxis)plot.getRangeAxis()).setRange(new Range(lowestY, highestY));
+
             }
 
             ChartPanel chartPanel = new ChartPanel(chart);
@@ -640,7 +694,7 @@ public class Graph2D extends ApplicationFrame {
                                     new Attribute(new AttributeType(AttributeType.Type.NormalAttribute), "yAxis", yAxis),
                                     new Attribute(new AttributeType( (plots2DDiscreteX.length > 0 ? AttributeType.Type.NormalAttribute : AttributeType.Type.TemporaryOrUnimportant) ), "valueForMissingData", valueForMissingData),
                                     new Attribute(new AttributeType( (plots2DDiscreteX.length > 0 ? AttributeType.Type.NormalAttribute : AttributeType.Type.TemporaryOrUnimportant) ), "plots2DDiscreteX", plots2DDiscreteX),
-                                    new Attribute(new AttributeType( (plots2DContinuosX.length > 0 ? AttributeType.Type.NormalAttribute : AttributeType.Type.TemporaryOrUnimportant) ), "plots2DContinuosX", plots2DContinuosX),
+                                    new Attribute(new AttributeType( (plots2DContinuousX.length > 0 ? AttributeType.Type.NormalAttribute : AttributeType.Type.TemporaryOrUnimportant) ), "plots2DContinuousX", plots2DContinuousX),
                                     new Attribute(new AttributeType(AttributeType.Type.NormalAttribute), "xAxisDiscreteInts", xAxisDiscreteInts),
                                     new Attribute(new AttributeType(AttributeType.Type.NormalAttribute), "yAxisDiscreteInts", yAxisDiscreteInts));
         }
@@ -679,6 +733,15 @@ public class Graph2D extends ApplicationFrame {
             inUse = true;
         }
 
+        /**
+         * gets the title.
+         *
+         * @return the title
+         */
+        public String getTitle () {
+            return title;
+        }
+
         @Override
         public List <Attribute> getAttributes() {
             return Utils.createList( new Attribute(new AttributeType(AttributeType.Type.Descriptor), "title", title),
@@ -712,15 +775,29 @@ public class Graph2D extends ApplicationFrame {
          * @param _title the title
          * @param ptMap an initializing map of points
          */
-        public Plot2DDiscreteX (String _title, Map <Long, Double> ptMap) {
+        public Plot2DDiscreteX (String _title, Map <Comparable, Double> ptMap) {
             super(_title);
 
-            List <Long> xValues = new ArrayList();
+            List <Comparable> xValues = new ArrayList();
             xValues.addAll(ptMap.keySet());
             //we sort the values, because there is no given order in the input-map
             Collections.sort(xValues);
-            for (Long x : xValues)
+            for (Comparable x : xValues)
                 add(x, ptMap.get(x));
+        }
+
+        /**
+         * creates of copy of the specified plot. The new plot
+         * won't be in use, will have a deepcopy of the points and
+         * can have a new title.
+         *
+         * @param from the origin plot
+         * @param newTitle the new title
+         */
+        public Plot2DDiscreteX (Plot2DDiscreteX from, String newTitle) {
+            super(newTitle);
+
+            pts.addAll(from.pts);
         }
 
         /**
@@ -735,6 +812,51 @@ public class Graph2D extends ApplicationFrame {
                 throw new GeneticRuntimeException("this plot is already in use - you can't add any points anymore.");
 
             pts.add(new Pt(_x, _y));
+        }
+
+        /**
+         * A discretized graph can have per discretized group still many different
+         * values. The standard behavior is, that a random value will represent the group.
+         * With this method, you can choose, which value should represent the group
+         *
+         * @param mergeOp an operator, that merges a set of double-values (the values on the y-axis)
+         */
+        public void mergePointsInSameDiscretizedGroup(MergeOperator mergeOp) {
+            List <Pt> newPts = new ArrayList();
+
+            //in every iteration-step, find the group with same x-values as the first point in pts
+            while (pts.size() > 0) {
+                List <Double> valuesInSameGroup = new ArrayList(Arrays.asList(pts.get(0).y));
+                for (int i=1; i<pts.size(); i++) {
+                    if (pts.get(i).x.equals(pts.get(0).x)) {
+                        valuesInSameGroup.add(pts.remove(i).y);
+                        i--;
+                    }
+                }
+
+                //do the merge
+                newPts.add(new Pt(pts.remove(0).x, mergeOp.merge(valuesInSameGroup)));
+            }
+            pts = newPts;
+        }
+
+        /**
+         * converts this plot in a continuous plot. If the
+         * x-values are not numbers, they will get numerated:
+         * 0, 1, 2, ...
+         *
+         * @return this plot in continuous form
+         */
+        public Plot2DContinuousX convertToContinuousPlot () {
+            double [] points = new double [pts.size()*2];
+            for (int i=0; i<pts.size(); i++) {
+                if (pts.get(i).x instanceof Number)
+                    points[i*2] = ((Number)pts.get(i).x).doubleValue();
+                else
+                    points[i*2] = i;
+                points[i*2+1] = pts.get(i).y;
+            }
+            return new Plot2DContinuousX(title, points);
         }
 
         @Override
@@ -781,7 +903,7 @@ public class Graph2D extends ApplicationFrame {
     /**
      * a non-discrete plot
      */
-    public static class Plot2DContinuosX extends Plot {
+    public static class Plot2DContinuousX extends Plot {
 
         /**
          * the points in insert-order
@@ -795,7 +917,7 @@ public class Graph2D extends ApplicationFrame {
          * @param pts an initializing set of points, the first double is a x-value, the second a y-value, the third the x-value of the second point and so on..
          * @throws IllegalArgumentException if length of point-array not dividable by 2
          */
-        public Plot2DContinuosX (String _title, double ... pts) {
+        public Plot2DContinuousX (String _title, double ... pts) {
             super(_title);
 
             if (pts.length%2 == 1)
@@ -811,7 +933,7 @@ public class Graph2D extends ApplicationFrame {
          * @param _title the title
          * @param ptMap an initializing map of points
          */
-        public Plot2DContinuosX (String _title, Map <Double, Double> ptMap) {
+        public Plot2DContinuousX (String _title, Map <Double, Double> ptMap) {
             super(_title);
 
             List <Double> xValues = new ArrayList();
@@ -820,6 +942,20 @@ public class Graph2D extends ApplicationFrame {
             Collections.sort(xValues);
             for (Double x : xValues)
                 add(x, ptMap.get(x));
+        }
+
+        /**
+         * creates of copy of the specified plot. The new plot
+         * won't be in use, will have a deepcopy of the points and
+         * can have a new title.
+         *
+         * @param from the origin plot
+         * @param newTitle the new title
+         */
+        public Plot2DContinuousX (Plot2DContinuousX from, String newTitle) {
+            super(newTitle);
+
+            pts.addAll(from.pts);
         }
 
         /**
@@ -834,6 +970,18 @@ public class Graph2D extends ApplicationFrame {
                 throw new GeneticRuntimeException("this plot is already in use - you can't add any points anymore.");
 
             pts.add(new Pt(_x, _y));
+        }
+
+        /**
+         * converts this plot in a discrete plot.
+         *
+         * @return this plot in discrete form
+         */
+        public Plot2DDiscreteX convertToDiscretePlot () {
+            Map <Comparable, Double> points = new HashMap();
+            for (Pt pt : pts)
+                points.put(pt.x, pt.y);
+            return new Plot2DDiscreteX(title, points);
         }
 
         /**

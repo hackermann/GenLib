@@ -31,7 +31,7 @@ import genlib.standard.operators.AverageFitness;
 import genlib.standard.operators.GenoToPhenoIdentity;
 import genlib.standard.operators.KPointCrossover;
 import genlib.standard.operators.OnePointMutation;
-import genlib.standard.representations.BinaryStaticLength;
+import genlib.standard.representations.BooleanStaticLength;
 import genlib.utils.Exceptions.GeneticRuntimeException;
 import genlib.utils.Utils;
 import java.util.ArrayList;
@@ -368,7 +368,7 @@ public abstract class GeneticAlgorithm extends GenObject {
 
         //should be set normally, but in the case not set, use standard binary array
         if (genoType == null)
-            setGenoType(new BinaryStaticLength(256));
+            setGenoType(new BooleanStaticLength(256));
 
         //in this case, there is no difference between geno- and pheno-type
         if (phenoType == null)

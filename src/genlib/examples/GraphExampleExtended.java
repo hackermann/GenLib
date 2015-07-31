@@ -26,12 +26,10 @@ package genlib.examples;
 
 import genlib.output.Graph2DLogger;
 import genlib.output.Graph2DLogger.AxisType;
-import genlib.output.Graph2DLogger.Pt;
 import genlib.output.TextLogger;
 import genlib.output.gui.Graph2D;
 import genlib.output.gui.Graph2D.PlotCollection;
 import genlib.standard.algorithms.StaticGeneticAlgorithm;
-import java.util.List;
 
 /**
  * An extended example to demonstrate the ability of this library to plot graphs.
@@ -40,6 +38,11 @@ import java.util.List;
  */
 public class GraphExampleExtended {
 
+    /**
+     * the entry-point for this example
+     *
+     * @param args arguments (unused)
+     */
     public static void main (String [] args) {
 
         //a standard genetic algorithm, the optimization-task is a standard example and not important for this example
@@ -71,12 +74,7 @@ public class GraphExampleExtended {
                 milliSecondsToGeneration25.createContinousPlot());
 
         //for the third plot, we want to have a discrete plot. We want to discretize the
-        //milliseconds in 7 groups, so at first we need to get the range of the measured milli-seconds
-        List <Pt> points = milliSecondsToGeneration25.getDataSortedByX();
-        double minX = points.get(0).getX().doubleValue();
-        double maxX = points.get(points.size()-1).getX().doubleValue();
-
-        //now we can discretize the plot: we have to calculate the area of one discretized block
+        //milliseconds in 7 groups
         PlotCollection plot3 = PlotCollection.createDiscretePointsChart(
                 milliSecondsToGeneration25.getSuggestedName(),
                 milliSecondsToGeneration25.getSuggestedXAxisName(),
@@ -84,7 +82,7 @@ public class GraphExampleExtended {
                 0.0,        //the standard-value, if one discretized group has no entry: this can't happen in our case, because we have just one plot
                 true,       //x-axis will get ints: the double values will be round
                 false,      //y-axis should be still doubles
-                milliSecondsToGeneration25.createDiscretePlot( (maxX-minX) / 7));       //(max-min)/7 => we get 7 groups
+                milliSecondsToGeneration25.createDiscretePlot( 7 ) );       //the data will be discretized in 7 groups
 
         //open ONE window with the 3 plots
         Graph2D.open(plot1, plot2, plot3);

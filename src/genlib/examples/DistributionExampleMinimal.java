@@ -24,17 +24,17 @@
 
 package genlib.examples;
 
-import genlib.output.Graph2DLogger;
-import genlib.output.Graph2DLogger.AxisType;
-import genlib.output.TextLogger;
-import genlib.standard.algorithms.StaticGeneticAlgorithm;
+import genlib.output.gui.Graph2D;
+import genlib.standard.distributions.AbstractDistribution.NumberType;
+import genlib.standard.distributions.GaussianDistribution;
+import genlib.standard.distributions.LinearDistribution;
 
 /**
- * A minimal example, how to do an graphical output with a plot.
+ * A minimal example, that demonstrates the distributions.
  *
  * @author Hilmar
  */
-public class GraphExampleMinimal {
+public class DistributionExampleMinimal {
 
     /**
      * the entry-point for this example
@@ -42,18 +42,8 @@ public class GraphExampleMinimal {
      * @param args arguments (unused)
      */
     public static void main (String [] args) {
-
-        //a standard genetic algorithm, the optimization-task is a standard example and not important for this example
-        StaticGeneticAlgorithm algorithm = new StaticGeneticAlgorithm();
-
-        //first we need a logger, to log our data: In this case we will log the generation (x-axis) vs the average fitness (y-axis)
-        Graph2DLogger graphLogger = new Graph2DLogger(AxisType.generations(), AxisType.averageFitness());
-
-        //run the algorithm, run with a text-logger additionally
-        algorithm.run(new TextLogger(), graphLogger);
-
-        //now we can open a window with our graph
-        graphLogger.createGraph2D();
+        GaussianDistribution distribution = new GaussianDistribution();
+        Graph2D.open(distribution.plotCollection(NumberType.Double));
 
     }
 

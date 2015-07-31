@@ -31,7 +31,7 @@ import genlib.abstractrepresentation.GeneticAlgorithm.Individuum;
 import genlib.output.Graph2DLogger.AxisType.BasicType;
 import genlib.output.gui.Graph2D;
 import genlib.output.gui.Graph2D.Plot;
-import genlib.output.gui.Graph2D.Plot2DContinuosX;
+import genlib.output.gui.Graph2D.Plot2DContinuousX;
 import genlib.output.gui.Graph2D.Plot2DDiscreteX;
 import genlib.utils.Exceptions.GeneticInternalException;
 import genlib.utils.Utils;
@@ -111,7 +111,7 @@ public class Graph2DLogger extends Logger {
      *
      * @return the plot-object
      */
-    public Plot2DContinuosX createContinousPlot() {
+    public Plot2DContinuousX createContinousPlot() {
         return createContinousPlot(getSuggestedName());
     }
 
@@ -122,8 +122,8 @@ public class Graph2DLogger extends Logger {
      * @param name the title of the plot
      * @return the plot-object
      */
-    public Plot2DContinuosX createContinousPlot(String name) {
-        Plot2DContinuosX plot = new Plot2DContinuosX(name);
+    public Plot2DContinuousX createContinousPlot(String name) {
+        Plot2DContinuousX plot = new Plot2DContinuousX(name);
         for (int i=0; i<xValues.size(); i++)
             plot.add(xValues.get(i).doubleValue(), yValues.get(i).doubleValue());
         return plot;
@@ -137,6 +137,20 @@ public class Graph2DLogger extends Logger {
      */
     public Plot2DDiscreteX createDiscretePlot() {
         return createDiscretePlot(getSuggestedName(), 1);
+    }
+
+    /**
+     * constructs a discretized plot of the measured data. Use Graph2D.open() to
+     * display this plot or construct a PlotCollection with multiple plot-objects.
+     * Consider, if there is not enough data, there can be created empty discretized
+     * blocks, so there can be less than discretizedBlockCount blocks!
+     *
+     * @param discretizedBlockCount the measured data will be grouped, the number of groups desired are in this parameter
+     * @return the plot-object
+     * @throws IllegalArgumentException if we have less than 1 discretizedBlockCount
+     */
+    public Plot2DDiscreteX createDiscretePlot(int discretizedBlockCount) {
+        return createDiscretePlot(getSuggestedName(), discretizedBlockCount);
     }
 
     /**
@@ -164,6 +178,30 @@ public class Graph2DLogger extends Logger {
     /**
      * constructs a discretized plot of the measured data. Use Graph2D.open() to
      * display this plot or construct a PlotCollection with multiple plot-objects.
+     * Consider, if there is not enough data, there can be created empty discretized
+     * blocks, so there can be less than discretizedBlockCount blocks!
+     *
+     * @param name the title of the plot
+     * @param discretizedBlockCount the measured data will be grouped, the number of groups desired are in this parameter
+     * @return the plot-object
+     * @throws IllegalArgumentException if we have less than 1 discretizedBlockCount
+     */
+    public Plot2DDiscreteX createDiscretePlot(String name, int discretizedBlockCount) {
+
+        if (discretizedBlockCount < 1)
+            throw new IllegalArgumentException("discretizedBlockCount has to be >= 1.");
+
+        //calculate the block size, so we get discretizedBlockCount blocks
+        List <Pt> points = getDataSortedByX();
+        double minX = points.get(0).getX().doubleValue();
+        double maxX = points.get(points.size()-1).getX().doubleValue();
+
+        return createDiscretePlot (name, (discretizedBlockCount == 1 ? Double.POSITIVE_INFINITY : (maxX-minX)/(discretizedBlockCount-1)) );
+    }
+
+    /**
+     * constructs a discretized plot of the measured data. Use Graph2D.open() to
+     * display this plot or construct a PlotCollection with multiple plot-objects.
      *
      * @param name the title of the plot
      * @param discretizeBlocks the measured data will be grouped, the groups are of the size of this parameter
@@ -175,11 +213,17 @@ public class Graph2DLogger extends Logger {
         for (Pt pt : pts) {
             Number xValue = pt.getX();
             if (xValue instanceof Double)
-                plot.add( new Double(((long)( (Double)xValue/discretizeBlocks))*discretizeBlocks), pt.getY().doubleValue());
+                plot.add( ((long) Math.floor( (Double)xValue/discretizeBlocks))*discretizeBlocks, pt.getY().doubleValue());
+            else if (xValue instanceof Float)
+                plot.add( ((long) Math.floor( (Float)xValue/discretizeBlocks))*discretizeBlocks, pt.getY().doubleValue());
             else if (xValue instanceof Integer)
-                plot.add( new Double(((int)( (Integer)xValue/discretizeBlocks))*discretizeBlocks), pt.getY().doubleValue());
+                plot.add( ((int) Math.floor( (Integer)xValue/discretizeBlocks))*discretizeBlocks, pt.getY().doubleValue());
             else if (xValue instanceof Long)
-                plot.add( new Double(((long)( (Long)xValue/discretizeBlocks))*discretizeBlocks), pt.getY().doubleValue());
+                plot.add( ((long) Math.floor( (Long)xValue/discretizeBlocks))*discretizeBlocks,  pt.getY().doubleValue());
+            else if (xValue instanceof Short)
+                plot.add( ((long) Math.floor( (Short)xValue/discretizeBlocks))*discretizeBlocks,  pt.getY().doubleValue());
+            else if (xValue instanceof Byte)
+                plot.add( ((long) Math.floor( (Byte)xValue/discretizeBlocks))*discretizeBlocks,  pt.getY().doubleValue());
             else
                 throw new GeneticInternalException("unexpected instance of Number: '" + xValue.getClass().getSimpleName() + "' (internal error)");
         }
@@ -238,6 +282,22 @@ public class Graph2DLogger extends Logger {
         return ret;
     }
 
+    /**
+     * adds a point to the data-set. x or y can be null,
+     * but the whole point will be ignored in this case.
+     *
+     * @param x the x-value, can be null
+     * @param y the y-value, can be null
+     */
+    public void addPoint (Number x, Number y) {
+
+        //if one of the values if null, this point is ignored
+        if (x != null && y != null) {
+            xValues.add(x);
+            yValues.add(y);
+        }
+    }
+
     @Override
     protected void log(LogType logType, GeneticAlgorithm algorithm) {
         if (logType == LogType.Generation) {
@@ -245,11 +305,8 @@ public class Graph2DLogger extends Logger {
             Number xValue = calculate(xAxis, algorithm);
             Number yValue = calculate(yAxis, algorithm);
 
-            //if one of the values if null, this point should not be saved
-            if (xValue != null && yValue != null) {
-                xValues.add(xValue);
-                yValues.add(yValue);
-            }
+            //if one of the values if null, this point will not be saved
+            addPoint(xValue, yValue);
         }
     }
 
@@ -311,6 +368,9 @@ public class Graph2DLogger extends Logger {
                 return avgFitness / (avgCount == 0 ? 1 : avgCount);
             }
 
+            case JustName:
+                return null;
+
             default:
                 throw new AssertionError(axisType.basicType.name());
         }
@@ -332,9 +392,9 @@ public class Graph2DLogger extends Logger {
 
         /**
          * The basic-type: Measure the Time, Generation (or just every k'th generation), the average fitness
-         * or the average fitness of the k best or worst individuums
+         * or the average fitness of the k best or worst individuums or measure nothing but specify a name
          */
-        protected enum BasicType {Time, KGeneration, AverageFitness, BestKFitnessAverage, WorstKFitnessAverage};
+        protected enum BasicType {Time, KGeneration, AverageFitness, BestKFitnessAverage, WorstKFitnessAverage, JustName};
 
         /**
          * the basicType, see the javadoc of the BasicType for more information
@@ -361,18 +421,25 @@ public class Graph2DLogger extends Logger {
         protected final int kFitness;
 
         /**
+         * if it is not null, this will be the suggested name
+         */
+        protected final String individualName;
+
+        /**
          * the constructor, should just be invoked of the static creation-methods.
          *
          * @param _basicType the basicType
          * @param _timeFactor the timeFactor
          * @param _kGenerations Just the k'th best or worst individuums will count.
          * @param _kFitness Just the k'th best or worst individuums will count.
+         * @param _individualName if it is not null, this will be the suggested name
          */
-        private AxisType (BasicType _basicType, double _timeFactor, int _kGenerations, int _kFitness) {
+        private AxisType (BasicType _basicType, double _timeFactor, int _kGenerations, int _kFitness, String _individualName) {
             basicType = _basicType;
             timeFactor = _timeFactor;
             kGenerations = _kGenerations;
             kFitness = _kFitness;
+            individualName = _individualName;
         }
 
         /**
@@ -411,6 +478,9 @@ public class Graph2DLogger extends Logger {
                 case WorstKFitnessAverage:
                     return "worst fitness" + (kFitness == 1 ? "" : " (average of the " + kFitness + " worst values)");
 
+                case JustName:
+                    return individualName;
+
                 default:
                     throw new AssertionError(basicType.name());
             }
@@ -422,7 +492,7 @@ public class Graph2DLogger extends Logger {
          * @return the requested axis-type
          */
         public static AxisType seconds () {
-            return new AxisType(BasicType.Time, 0.000001, -1, -1);
+            return new AxisType(BasicType.Time, 0.000001, -1, -1, null);
         }
 
         /**
@@ -431,7 +501,7 @@ public class Graph2DLogger extends Logger {
          * @return the requested axis-type
          */
         public static AxisType milliSeconds () {
-            return new AxisType(BasicType.Time, 0.001, -1, -1);
+            return new AxisType(BasicType.Time, 0.001, -1, -1, null);
         }
 
         /**
@@ -440,7 +510,7 @@ public class Graph2DLogger extends Logger {
          * @return the requested axis-type
          */
         public static AxisType microSeconds () {
-            return new AxisType(BasicType.Time, 1, -1, -1);
+            return new AxisType(BasicType.Time, 1, -1, -1, null);
         }
 
         /**
@@ -456,7 +526,7 @@ public class Graph2DLogger extends Logger {
             if (factorToSeconds < 0.0000001)
                 throw new IllegalArgumentException("microseconds is the minimum precision of the measuring. (factor should be >= 0.000001)");
 
-            return new AxisType(BasicType.Time, (0.000001/factorToSeconds), -1, -1);
+            return new AxisType(BasicType.Time, (0.000001/factorToSeconds), -1, -1, null);
         }
 
         /**
@@ -465,7 +535,7 @@ public class Graph2DLogger extends Logger {
          * @return the requested axis-type
          */
         public static AxisType generations () {
-            return new AxisType(BasicType.KGeneration, Double.NaN, 1, -1);
+            return new AxisType(BasicType.KGeneration, Double.NaN, 1, -1, null);
         }
 
         /**
@@ -480,7 +550,7 @@ public class Graph2DLogger extends Logger {
             if (kGenerations < 1)
                 throw new IllegalArgumentException("k has to be at least 1.");
 
-            return new AxisType(BasicType.KGeneration, Double.NaN, kGenerations, -1);
+            return new AxisType(BasicType.KGeneration, Double.NaN, kGenerations, -1, null);
         }
 
         /**
@@ -489,7 +559,7 @@ public class Graph2DLogger extends Logger {
          * @return the requested axis-type
          */
         public static AxisType averageFitness () {
-            return new AxisType(BasicType.AverageFitness, Double.NaN, -1, -1);
+            return new AxisType(BasicType.AverageFitness, Double.NaN, -1, -1, null);
         }
 
         /**
@@ -498,7 +568,7 @@ public class Graph2DLogger extends Logger {
          * @return the requested axis-type
          */
         public static AxisType bestFitness () {
-            return new AxisType(BasicType.BestKFitnessAverage, Double.NaN, -1, 1);
+            return new AxisType(BasicType.BestKFitnessAverage, Double.NaN, -1, 1, null);
         }
 
         /**
@@ -513,7 +583,7 @@ public class Graph2DLogger extends Logger {
             if (bestKFitness < 1)
                 throw new IllegalArgumentException("the best average fitness has to be calculated at least from 1 fitness.");
 
-            return new AxisType(BasicType.BestKFitnessAverage, Double.NaN, -1, bestKFitness);
+            return new AxisType(BasicType.BestKFitnessAverage, Double.NaN, -1, bestKFitness, null);
         }
 
         /**
@@ -522,7 +592,7 @@ public class Graph2DLogger extends Logger {
          * @return the requested axis-type
          */
         public static AxisType worstFitness () {
-            return new AxisType(BasicType.WorstKFitnessAverage, Double.NaN, -1, 1);
+            return new AxisType(BasicType.WorstKFitnessAverage, Double.NaN, -1, 1, null);
         }
 
         /**
@@ -537,7 +607,22 @@ public class Graph2DLogger extends Logger {
             if (worstKFitness < 1)
                 throw new IllegalArgumentException("the worst average fitness has to be calculated at least from 1 fitness.");
 
-            return new AxisType(BasicType.WorstKFitnessAverage, 0.000001, -1, worstKFitness);
+            return new AxisType(BasicType.WorstKFitnessAverage, Double.NaN, -1, worstKFitness, null);
+        }
+
+        /**
+         * the creation-method for an axis, that will measure nothing, but have
+         * an individual name specified.
+         *
+         * @param name the individual name
+         * @return the requested axis-type
+         * @throws NullPointerException if the parameter is null
+         */
+        public static AxisType justName (String name) {
+            if (name == null)
+                throw new NullPointerException("the name can't be null.");
+
+            return new AxisType(BasicType.JustName, Double.NaN, -1, -1, name);
         }
 
         @Override

@@ -1,0 +1,32 @@
+=========
+TODO
+=========
+
+inherit GenRepresentation and the corresponding operators
+hierarchical GenRepresentation (AND / OR) and the corresponding operatos
+Graph export in R
+example-implementations: sales-travelling-problem (mutation: swap 2 entries / revert 1 chain of values - recombination prefix of indiv. 1 and order of the rest / look at adjacence-lists, start with random and look for adjacences with less possibilities)
+gray-enccoding (XOR)
+extend existing operators at existing representations
+gauss-mutation (one value mutates with gauss-distribution)
+diversity for population (avg distance between populations (calculated exactly and with random-examples) / shannon-entropy (page 62) / sub-string-entropy (page 63))
+different genetic-algorithms (complete replacing of parent-population, end after good enough individuum found)
+(environment/recombination/mutation-selection) selection of best part of population: take best n, fitness-proportional (circle, filled with all fitnesses, n random), tournament-selection, rank-selection (can be combined with fitness-proportional/tournament, identity, uniform (every individuum with same choose-probability))
+maybe abstract selection-requirements: multiple selection allowed / not allowed (duplicate-free), number of wished selection-individuums (static number / at least .. / at most ..)
+overlap-factor (how much individuums are in new poplation from the parent-generation?): replace worst/oldest/random parents
+selection-intensity (page 70)
+uniform-crossover (every entry has 1/2 probability of left or right) / interpolational recombination (static random interpolation, random for every entry) / extrapolational recombination
+OR-operators (with probability per child operator)
+multiple-recombination-output (just for non-deterministic childs), just execute child multiple times (maybe with a RandomNto1-abstract-operator (non-deterministic and n input, 1 output))
+**
+Forma F = *001*100*1
+two Forma F1 anf F2 are compatible, if there is at least 1 individuum they share
+more complex formas: as example: after every entry with value x should be the same entry
+good forma: most of the formas should be dividable in smaller formas (as example: *0**1* and *0**0* => *0****) / compatible with recombination-operator:
+    * (1) after recombination, if BOTH parents have the forma, the forma is still valid in the childs
+    * (2) if the child has the forma after recombinations AT LEAST 1 of the parents should have this forma
+    * (3) if two formas are compatible, the recombination-op should be able to produce a child with this child which shares the formas (if parent 1 has forma1 and parent2 has forma2)
+**
+improvement individuum A to B: 0 if B worse than A, otherwise: fitness(B)-fitness(A)
+relative expected improvement of mutation / recombination-operator (can be done every 10 or 20 generations with example-tests => adaptive algorithms)
+imagine operator (recombination /mutation) with a step-size: (a) constant step-size (b) step-size will be lowered with constant factor (c) adaptive: count of better solutions after operator vs count of worse solutions after operator (in last generation) > constant value => higher the step-size otherwise lower the step size (d) self-adaptive: additional information of stepsize in individdum, that will go through evolution too (as example with gauss-change)

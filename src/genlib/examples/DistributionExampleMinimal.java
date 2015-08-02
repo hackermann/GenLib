@@ -25,9 +25,9 @@
 package genlib.examples;
 
 import genlib.output.gui.Graph2D;
-import genlib.standard.distributions.AbstractDistribution.NumberType;
-import genlib.standard.distributions.GaussianDistribution;
-import genlib.standard.distributions.LinearDistribution;
+import genlib.extended.distributions.AbstractDistribution.NumberType;
+import genlib.extended.distributions.GaussianDistribution;
+import genlib.extended.distributions.LinearDistribution;
 
 /**
  * A minimal example, that demonstrates the distributions.

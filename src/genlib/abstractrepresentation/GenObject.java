@@ -203,7 +203,7 @@ public abstract class GenObject {
     /**
      * defines the type of an attribute of a class
      */
-    public static class AttributeType {
+    public static class AttributeType extends GenObject {        
 
         /**
          * defines the basic type: HierarchicalParent and HierarchicalChild are reserved
@@ -280,6 +280,13 @@ public abstract class GenObject {
          */
         public Recommended getRecommendedEqualsCheck () {
             return recommendedEqualsCheck;
+        }
+        
+        @Override
+        public List<Attribute> getAttributes() {
+            return Utils.createList(new Attribute(new AttributeType(Type.MainAttribute), "type", type),
+                                    new Attribute(new AttributeType(Type.NormalAttribute), "recommendedOutput", recommendedOutput),
+                                    new Attribute(new AttributeType(Type.NormalAttribute), "recommendedEqualsCheck", recommendedEqualsCheck));
         }
 
     }

@@ -154,6 +154,15 @@ public abstract class GeneticAlgorithm extends GenObject {
         if (genoToPheno != null && !genoToPheno.isCompatibleGenoType(genoType))
             throw new IllegalArgumentException("genoType is not compatible with genoToPhenoOperator.");
     }
+    
+    /**
+     * returns the genoType
+     * 
+     * @return the genoType
+     */
+    public GenRepresentation getGenoType() {
+        return genoType;
+    }
 
     /**
      * sets the phenoType
@@ -176,6 +185,15 @@ public abstract class GeneticAlgorithm extends GenObject {
         if (fitness != null && !fitness.isCompatible(phenoType))
             throw new IllegalArgumentException("phenoType is not compatible with fitnessOperator.");
     }
+    
+    /**
+     * returns the phenoType
+     * 
+     * @return the phenoType
+     */
+    public GenRepresentation getPhenoType() {
+        return phenoType;
+    }
 
     /**
      * sets the recombinationOperator
@@ -196,6 +214,15 @@ public abstract class GeneticAlgorithm extends GenObject {
         if (genoType != null && !recombination.isCompatible(genoType))
             throw new IllegalArgumentException("genoType is not compatible with recombinationOperator.");
     }
+    
+    /**
+     * returns the recombinationOperator
+     * 
+     * @return the recombinationOperator
+     */
+    public RecombinationOp getRecombinationOp() {
+        return recombination;
+    }
 
     /**
      * sets the mutationOperator
@@ -215,6 +242,15 @@ public abstract class GeneticAlgorithm extends GenObject {
 
         if (genoType != null && !mutation.isCompatible(genoType))
             throw new IllegalArgumentException("genoType is not compatible with mutationOperator.");
+    }
+    
+    /**
+     * returns the mutationOperator
+     * 
+     * @return the mutationOperator
+     */
+    public MutationOp getMutationOp() {
+        return mutation;
     }
 
     /**
@@ -238,6 +274,15 @@ public abstract class GeneticAlgorithm extends GenObject {
         if (phenoType != null && !genoToPheno.isCompatiblePhenoType(phenoType))
             throw new IllegalArgumentException("phenoType is not compatible with genoToPhenoOperator.");
     }
+    
+    /**
+     * returns the genoToPhenoOperator
+     * 
+     * @return the genoToPhenoOperator
+     */
+    public GenoToPhenoOp getGenoToPhenoOp() {
+        return genoToPheno;
+    }
 
     /**
      * sets the fitnessOperator
@@ -258,6 +303,15 @@ public abstract class GeneticAlgorithm extends GenObject {
         if (phenoType != null && !fitness.isCompatible(phenoType))
             throw new IllegalArgumentException("phenoType is not compatible with fitnessOperator.");
     }
+    
+    /**
+     * returns the fitnessOperator
+     * 
+     * @return the fitnessOperator
+     */
+    public FitnessOp getFitnessOp() {
+        return fitness;
+    }
 
     /**
      * sets the staticAlgorithmPass (null = there is no static algorithm pass)
@@ -270,6 +324,15 @@ public abstract class GeneticAlgorithm extends GenObject {
             throw new GeneticRuntimeException("you can't change the staticAlgorithmPass, while the algorithm is running.");
 
         staticAlgorithmPass = _staticAlgorithmPass;
+    }
+    
+    /**
+     * returns the staticAlgorithmPass
+     * 
+     * @return the staticAlgorithmPass
+     */
+    public AlgorithmPass getStaticAlgorithmPass() {
+        return staticAlgorithmPass;
     }
 
     /**
@@ -389,7 +452,7 @@ public abstract class GeneticAlgorithm extends GenObject {
                 throw new GeneticRuntimeException("incompatible input-size (between algorithm and recombinationOperator): '" + inputSize + "'.");
         for (int outputSize : getRecombinationOutputSize())
             if (!recombination.isOutputSizeCompatible(outputSize))
-                throw new GeneticRuntimeException("incompatible output-size (between algorithm and recombinationOperator): '" + outputSize + "'.");
+                throw new GeneticRuntimeException("incompatible output-size (between algorithm and recombinationOperator): '" + outputSize + "'.");                
     }
 
     protected abstract AlgorithmPass getStandardAlgorithmPass();
@@ -434,8 +497,10 @@ public abstract class GeneticAlgorithm extends GenObject {
         currentGeneration = 0;
         population = new ArrayList();
 
-        for (Logger logger : loggers)
+        for (Logger logger : loggers) {
+            logger.compatibilityCheck(this);
             logger.startAlgorithm(this);
+        }
 
         //the algorithm step defines the state of the running algorithm
         AlgorithmStep step = algorithmPass.createInitial();
@@ -566,7 +631,7 @@ public abstract class GeneticAlgorithm extends GenObject {
         public List <Attribute> getAttributes() {
             return Utils.createList(new Attribute(new AttributeType(Type.HierarchicalChild), "genoInstance", genoInstance),
                                     new Attribute(new AttributeType(Type.HierarchicalChild, (genoToPheno instanceof GenoToPhenoIdentity ? Recommended.No : Recommended.NotSpecified), Recommended.NotSpecified), "phenoInstance", phenoInstance),
-                                    new Attribute(new AttributeType(Type.MainAttribute), "fitness", fitnessValue));
+                                    new Attribute(new AttributeType(Type.MainAttribute), "fitnessValue", fitnessValue));
         }
 
     }

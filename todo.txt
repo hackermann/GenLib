@@ -1,3 +1,11 @@
+===================
+Currently in work
+===================
+
+diversity for population (avg distance between populations (calculated exactly and with random-examples) / shannon-entropy (page 62) / sub-string-entropy (page 63))
+
+
+
 =========
 TODO
 =========
@@ -9,7 +17,6 @@ example-implementations: sales-travelling-problem (mutation: swap 2 entries / re
 gray-enccoding (XOR)
 extend existing operators at existing representations
 gauss-mutation (one value mutates with gauss-distribution)
-diversity for population (avg distance between populations (calculated exactly and with random-examples) / shannon-entropy (page 62) / sub-string-entropy (page 63))
 different genetic-algorithms (complete replacing of parent-population, end after good enough individuum found)
 (environment/recombination/mutation-selection) selection of best part of population: take best n, fitness-proportional (circle, filled with all fitnesses, n random), tournament-selection, rank-selection (can be combined with fitness-proportional/tournament, identity, uniform (every individuum with same choose-probability))
 maybe abstract selection-requirements: multiple selection allowed / not allowed (duplicate-free), number of wished selection-individuums (static number / at least .. / at most ..)

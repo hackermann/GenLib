@@ -26,8 +26,8 @@ package genlib.standard.representations;
 
 import genlib.abstractrepresentation.AlgorithmStep;
 import genlib.abstractrepresentation.GenInstance;
-import genlib.standard.distributions.BasicTypeDistributions.CharDistribution;
-import genlib.standard.distributions.LinearDistribution;
+import genlib.extended.distributions.BasicTypeDistributions.CharDistribution;
+import genlib.extended.distributions.LinearDistribution;
 import genlib.standard.representations.AnyTypeStaticLength.AnyLongStaticLength;
 import genlib.standard.representations.AnyTypeStaticLength.AnyTypeStaticLengthInstance.AnyLongStaticLengthInstance;
 import genlib.utils.Utils;
@@ -93,6 +93,11 @@ public class CharStaticLength extends AnyLongStaticLength {
         for (int i=0; i<randomArray.length; i++)
             randomArray[i] = distribution.getRandomChar(step.getRandom());
         return new CharStaticLengthInstance(this, randomArray);
+    }
+    
+    @Override
+    public List<Attribute> getAttributes() {
+        return Utils.extendList( super.getAttributes(), new Attribute(new AttributeType(AttributeType.Type.MainAttribute), "distribution", distribution) );
     }
 
     /**

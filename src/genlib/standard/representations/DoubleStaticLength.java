@@ -26,8 +26,8 @@ package genlib.standard.representations;
 
 import genlib.abstractrepresentation.AlgorithmStep;
 import genlib.abstractrepresentation.GenInstance;
-import genlib.standard.distributions.BasicTypeDistributions.DoubleDistribution;
-import genlib.standard.distributions.LinearDistribution;
+import genlib.extended.distributions.BasicTypeDistributions.DoubleDistribution;
+import genlib.extended.distributions.LinearDistribution;
 import genlib.standard.representations.AnyTypeStaticLength.AnyDoubleStaticLength;
 import genlib.standard.representations.AnyTypeStaticLength.AnyLongStaticLength;
 import genlib.standard.representations.AnyTypeStaticLength.AnyTypeStaticLengthInstance.AnyDoubleStaticLengthInstance;
@@ -92,6 +92,11 @@ public class DoubleStaticLength extends AnyDoubleStaticLength {
         for (int i=0; i<randomArray.length; i++)
             randomArray[i] = getRandomDouble(step.getRandom());
         return new DoubleStaticLengthInstance(this, randomArray);
+    }
+    
+    @Override
+    public List<Attribute> getAttributes() {
+        return Utils.extendList( super.getAttributes(), new Attribute(new AttributeType(AttributeType.Type.MainAttribute), "distribution", distribution) );
     }
 
     /**

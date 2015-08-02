@@ -22,23 +22,10 @@
  * THE SOFTWARE.
  */
 
-package genlib.standard.distributions;
+package genlib.extended.distributions;
 
-import genlib.output.Graph2DLogger;
-import genlib.output.Graph2DLogger.AxisType;
-import genlib.output.gui.Graph2D;
-import genlib.output.gui.Graph2D.Plot2DDiscreteX;
-import genlib.output.gui.Graph2D.PlotCollection;
-import genlib.standard.distributions.BasicTypeDistributions.ByteDistribution;
-import genlib.standard.distributions.BasicTypeDistributions.CharDistribution;
-import genlib.standard.distributions.BasicTypeDistributions.DoubleDistribution;
-import genlib.standard.distributions.BasicTypeDistributions.FloatDistribution;
-import genlib.standard.distributions.BasicTypeDistributions.IntDistribution;
-import genlib.standard.distributions.BasicTypeDistributions.LongDistribution;
-import genlib.standard.distributions.BasicTypeDistributions.ShortDistribution;
-import genlib.utils.MergeOperator.AddMerge;
+import genlib.abstractrepresentation.GenObject.AttributeType.Type;
 import genlib.utils.Utils;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -49,7 +36,7 @@ import java.util.Random;
  *
  * @author Hilmar
  */
-public class LinearDistribution extends AbstractDistribution {
+public class LinearDistribution extends AbstractDistribution {       
 
     /**
      * the minimum and maximum value, saved as long
@@ -192,4 +179,12 @@ public class LinearDistribution extends AbstractDistribution {
         return (float)(random.nextFloat()*(maxD-minD)+minD);
     }
 
+    @Override
+    public List<Attribute> getAttributes() {
+        return Utils.extendList(super.getAttributes(),
+                new Attribute(new AttributeType(Type.MainAttribute), "minL", minL),
+                new Attribute(new AttributeType(Type.MainAttribute), "maxL", maxL),
+                new Attribute(new AttributeType(Type.MainAttribute), "minD", minD),
+                new Attribute(new AttributeType(Type.MainAttribute), "maxD", maxD));
+    }
 }

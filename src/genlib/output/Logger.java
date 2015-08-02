@@ -91,6 +91,14 @@ public abstract class Logger extends GenObject {
     public void logGeneration(GeneticAlgorithm algorithm) {
         log(LogType.Generation, algorithm);
     }
+    
+    /**
+     * this method does a compatibility check with the geneticAlgorithm.
+     * The operators and representations of the algorithm should be set.
+     * 
+     * @param algorithm the algorithm
+     */
+    public abstract void compatibilityCheck(GeneticAlgorithm algorithm);
 
     /**
      * this method processes in the subclass the actual logging

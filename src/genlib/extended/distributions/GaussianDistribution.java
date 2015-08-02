@@ -22,8 +22,11 @@
  * THE SOFTWARE.
  */
 
-package genlib.standard.distributions;
+package genlib.extended.distributions;
 
+import genlib.abstractrepresentation.GenObject.AttributeType.Type;
+import genlib.utils.Utils;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -33,7 +36,7 @@ import java.util.Random;
  *
  * @author Hilmar
  */
-public class GaussianDistribution extends AbstractDistribution {
+public class GaussianDistribution extends AbstractDistribution {        
 
     /**
      * the center of the gaussian distribution
@@ -192,6 +195,17 @@ public class GaussianDistribution extends AbstractDistribution {
     @Override
     public float getRandomFloat(Random random) {
         return (float)getRandomDouble(random);
+    }
+    
+    @Override
+    public List<Attribute> getAttributes() {
+        return Utils.extendList(super.getAttributes(),
+                new Attribute(new AttributeType(Type.MainAttribute), "center", center),
+                new Attribute(new AttributeType(Type.MainAttribute), "factorLeft", factorLeft),
+                new Attribute(new AttributeType(Type.MainAttribute), "factorRight", factorRight),
+                new Attribute(new AttributeType(Type.NormalAttribute), "maxLeft", maxLeft),
+                new Attribute(new AttributeType(Type.NormalAttribute), "maxRight", maxRight),
+                new Attribute(new AttributeType(Type.NormalAttribute), "correctLeftRightDistribution", correctLeftRightDistribution));
     }
 
 }

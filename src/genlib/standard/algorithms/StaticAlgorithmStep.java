@@ -66,8 +66,12 @@ public class StaticAlgorithmStep extends AlgorithmStep {
      *
      * @param _parent the parent
      * @param _generation the generation-number
+     * @throws NullPointerException if _parent is null
      */
     public StaticAlgorithmStep (StaticAlgorithmPass _parent, int _generation) {
+        if (_parent == null)
+            throw new NullPointerException("_parent can't be null.");
+                    
         parent = _parent;
         generation = _generation;
         operationStep = -1;
@@ -78,8 +82,12 @@ public class StaticAlgorithmStep extends AlgorithmStep {
      *
      * @param from copied from this StaticAlgorithmStep
      * @param _step sub-step while being in one generation
+     * @throws NullPointerException if from is null
      */
     public StaticAlgorithmStep (StaticAlgorithmStep from, int _step) {
+        if (from == null)
+            throw new NullPointerException("from can't be null.");
+        
         parent = from.parent;
         generation = from.generation;
         operationStep = _step;

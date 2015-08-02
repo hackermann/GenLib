@@ -286,7 +286,7 @@ public class Graph2D extends ApplicationFrame {
                     titlesInUse.add(plots2DDiscreteX[i].getTitle());
                     plots2DDiscreteX[i].finish();
                 }
-            }
+            } 
             if (plots2DContinuousX != null) {
                 if (plots2DContinuousX.length == 0)
                     throw new IllegalArgumentException("there has to be at least 1 plot.");
@@ -692,9 +692,9 @@ public class Graph2D extends ApplicationFrame {
                                     new Attribute(new AttributeType(AttributeType.Type.Descriptor), "title", title),
                                     new Attribute(new AttributeType(AttributeType.Type.NormalAttribute), "xAxis", xAxis),
                                     new Attribute(new AttributeType(AttributeType.Type.NormalAttribute), "yAxis", yAxis),
-                                    new Attribute(new AttributeType( (plots2DDiscreteX.length > 0 ? AttributeType.Type.NormalAttribute : AttributeType.Type.TemporaryOrUnimportant) ), "valueForMissingData", valueForMissingData),
-                                    new Attribute(new AttributeType( (plots2DDiscreteX.length > 0 ? AttributeType.Type.NormalAttribute : AttributeType.Type.TemporaryOrUnimportant) ), "plots2DDiscreteX", plots2DDiscreteX),
-                                    new Attribute(new AttributeType( (plots2DContinuousX.length > 0 ? AttributeType.Type.NormalAttribute : AttributeType.Type.TemporaryOrUnimportant) ), "plots2DContinuousX", plots2DContinuousX),
+                                    new Attribute(new AttributeType( (plots2DDiscreteX != null ? AttributeType.Type.NormalAttribute : AttributeType.Type.TemporaryOrUnimportant) ), "valueForMissingData", valueForMissingData),
+                                    new Attribute(new AttributeType( (plots2DDiscreteX != null ? AttributeType.Type.NormalAttribute : AttributeType.Type.TemporaryOrUnimportant) ), "plots2DDiscreteX", plots2DDiscreteX),
+                                    new Attribute(new AttributeType( (plots2DContinuousX != null ? AttributeType.Type.NormalAttribute : AttributeType.Type.TemporaryOrUnimportant) ), "plots2DContinuousX", plots2DContinuousX),
                                     new Attribute(new AttributeType(AttributeType.Type.NormalAttribute), "xAxisDiscreteInts", xAxisDiscreteInts),
                                     new Attribute(new AttributeType(AttributeType.Type.NormalAttribute), "yAxisDiscreteInts", yAxisDiscreteInts));
         }

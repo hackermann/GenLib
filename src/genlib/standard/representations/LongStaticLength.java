@@ -26,8 +26,8 @@ package genlib.standard.representations;
 
 import genlib.abstractrepresentation.AlgorithmStep;
 import genlib.abstractrepresentation.GenInstance;
-import genlib.standard.distributions.BasicTypeDistributions.LongDistribution;
-import genlib.standard.distributions.LinearDistribution;
+import genlib.extended.distributions.BasicTypeDistributions.LongDistribution;
+import genlib.extended.distributions.LinearDistribution;
 import genlib.standard.representations.AnyTypeStaticLength.AnyLongStaticLength;
 import genlib.standard.representations.AnyTypeStaticLength.AnyTypeStaticLengthInstance.AnyLongStaticLengthInstance;
 import genlib.utils.Utils;
@@ -91,6 +91,12 @@ public class LongStaticLength extends AnyLongStaticLength {
             randomArray[i] = getRandomLong(step.getRandom());
         return new LongStaticLengthInstance(this, randomArray);
     }
+    
+    @Override
+    public List<Attribute> getAttributes() {
+        return Utils.extendList( super.getAttributes(), new Attribute(new AttributeType(AttributeType.Type.MainAttribute), "distribution", distribution) );
+    }
+
 
     /**
      * this class represents an LongStaticLength - instance

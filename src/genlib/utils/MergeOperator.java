@@ -24,6 +24,7 @@
 
 package genlib.utils;
 
+import genlib.abstractrepresentation.GenObject;
 import java.util.Collections;
 import java.util.List;
 
@@ -33,7 +34,7 @@ import java.util.List;
  *
  * @author Hilmar
  */
-public abstract class MergeOperator {
+public abstract class MergeOperator extends GenObject {
 
     /**
      * the actual operator
@@ -53,6 +54,11 @@ public abstract class MergeOperator {
             return Collections.min(values);
         }
 
+        @Override
+        public List<Attribute> getAttributes() {
+            return Utils.createList();
+        }
+
     }
 
     /**
@@ -63,6 +69,11 @@ public abstract class MergeOperator {
         @Override
         public double merge(List <Double> values) {
             return Collections.max(values);
+        }
+        
+        @Override
+        public List<Attribute> getAttributes() {
+            return Utils.createList();
         }
 
     }
@@ -79,6 +90,11 @@ public abstract class MergeOperator {
                 avg += value/values.size();
             return avg;
         }
+        
+        @Override
+        public List<Attribute> getAttributes() {
+            return Utils.createList();
+        }
 
     }
 
@@ -93,6 +109,11 @@ public abstract class MergeOperator {
             for (Double value : values)
                 sum += value;
             return sum;
+        }
+        
+        @Override
+        public List<Attribute> getAttributes() {
+            return Utils.createList();
         }
 
     }

@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-package genlib.standard.distributions;
+package genlib.extended.distributions;
 
 import java.util.Random;
 

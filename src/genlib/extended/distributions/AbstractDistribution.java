@@ -22,20 +22,22 @@
  * THE SOFTWARE.
  */
 
-package genlib.standard.distributions;
+package genlib.extended.distributions;
 
+import genlib.abstractrepresentation.GenObject;
+import genlib.extended.distributions.BasicTypeDistributions.ByteDistribution;
+import genlib.extended.distributions.BasicTypeDistributions.CharDistribution;
+import genlib.extended.distributions.BasicTypeDistributions.DoubleDistribution;
+import genlib.extended.distributions.BasicTypeDistributions.FloatDistribution;
+import genlib.extended.distributions.BasicTypeDistributions.IntDistribution;
+import genlib.extended.distributions.BasicTypeDistributions.LongDistribution;
+import genlib.extended.distributions.BasicTypeDistributions.ShortDistribution;
 import genlib.output.Graph2DLogger;
 import genlib.output.Graph2DLogger.AxisType;
 import genlib.output.gui.Graph2D.Plot2DDiscreteX;
 import genlib.output.gui.Graph2D.PlotCollection;
-import genlib.standard.distributions.BasicTypeDistributions.ByteDistribution;
-import genlib.standard.distributions.BasicTypeDistributions.CharDistribution;
-import genlib.standard.distributions.BasicTypeDistributions.DoubleDistribution;
-import genlib.standard.distributions.BasicTypeDistributions.FloatDistribution;
-import genlib.standard.distributions.BasicTypeDistributions.IntDistribution;
-import genlib.standard.distributions.BasicTypeDistributions.LongDistribution;
-import genlib.standard.distributions.BasicTypeDistributions.ShortDistribution;
 import genlib.utils.MergeOperator.AddMerge;
+import genlib.utils.Utils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -45,7 +47,7 @@ import java.util.Random;
  *
  * @author Hilmar
  */
-public abstract class AbstractDistribution implements LongDistribution, IntDistribution, ShortDistribution, CharDistribution, ByteDistribution, DoubleDistribution, FloatDistribution {
+public abstract class AbstractDistribution extends GenObject implements LongDistribution, IntDistribution, ShortDistribution, CharDistribution, ByteDistribution, DoubleDistribution, FloatDistribution {
 
     /**
      * all supported basic-types
@@ -147,6 +149,11 @@ public abstract class AbstractDistribution implements LongDistribution, IntDistr
             default:
                 throw new AssertionError(numberType.name());
         }
+    }
+    
+    @Override
+    public List<Attribute> getAttributes() {
+        return Utils.createList();
     }
 
 }

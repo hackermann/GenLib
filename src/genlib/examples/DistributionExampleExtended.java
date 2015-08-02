@@ -27,9 +27,9 @@ package genlib.examples;
 import genlib.output.gui.Graph2D;
 import genlib.output.gui.Graph2D.Plot2DContinuousX;
 import genlib.output.gui.Graph2D.PlotCollection;
-import genlib.standard.distributions.AbstractDistribution;
-import genlib.standard.distributions.GaussianDistribution;
-import genlib.standard.distributions.LinearDistribution;
+import genlib.extended.distributions.AbstractDistribution;
+import genlib.extended.distributions.GaussianDistribution;
+import genlib.extended.distributions.LinearDistribution;
 
 /**
  * An extended example, that demonstrates the distributions.

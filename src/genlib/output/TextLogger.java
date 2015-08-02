@@ -111,6 +111,9 @@ public class TextLogger extends Logger {
         populationLogging = _populationLogging;
         timeLogging = _timeLogging;
     }
+    
+    @Override
+    public void compatibilityCheck(GeneticAlgorithm algorithm) { }
 
     @Override
     protected void log (LogType logType, GeneticAlgorithm algorithm) {

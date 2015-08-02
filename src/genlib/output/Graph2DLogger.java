@@ -24,20 +24,24 @@
 
 package genlib.output;
 
+import genlib.abstractrepresentation.GenInstance;
 import genlib.abstractrepresentation.GenObject;
 import genlib.abstractrepresentation.GenObject.AttributeType.Type;
 import genlib.abstractrepresentation.GeneticAlgorithm;
 import genlib.abstractrepresentation.GeneticAlgorithm.Individuum;
+import genlib.extended.diversity.AbstractDiversity;
 import genlib.output.Graph2DLogger.AxisType.BasicType;
 import genlib.output.gui.Graph2D;
 import genlib.output.gui.Graph2D.Plot;
 import genlib.output.gui.Graph2D.Plot2DContinuousX;
 import genlib.output.gui.Graph2D.Plot2DDiscreteX;
 import genlib.utils.Exceptions.GeneticInternalException;
+import genlib.utils.Exceptions.GeneticRuntimeException;
 import genlib.utils.Utils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 /**
  * This logger logs specified informations, so a 2d-graph can be drawn afterwards.
@@ -65,6 +69,12 @@ public class Graph2DLogger extends Logger {
      * the values of the y-axis, in the order they arrived
      */
     protected List <Number> yValues = new ArrayList();
+    
+    /**
+     * this random-object will be resetted with every starting(), because
+     * we want to have deterministic logging results
+     */
+    protected Random staticRandom;
 
     /**
      * the constructor
@@ -297,6 +307,12 @@ public class Graph2DLogger extends Logger {
             yValues.add(y);
         }
     }
+    
+    @Override
+    public void compatibilityCheck(GeneticAlgorithm algorithm) {
+        xAxis.compatibilityCheck(algorithm);
+        yAxis.compatibilityCheck(algorithm);
+    }
 
     @Override
     protected void log(LogType logType, GeneticAlgorithm algorithm) {
@@ -315,6 +331,7 @@ public class Graph2DLogger extends Logger {
         startMicroTime = System.nanoTime()/1000;
         xValues = new ArrayList();
         yValues = new ArrayList();
+        staticRandom = new Random(123456789);
     }
 
     @Override
@@ -370,6 +387,15 @@ public class Graph2DLogger extends Logger {
 
             case JustName:
                 return null;
+                
+            case DiversityGenoType:
+            case DiversityPhenoType:
+                List <GenInstance> genInstances = new ArrayList(); 
+                for (Individuum individuum : algorithm.getCurrentPopulation())
+                    genInstances.add( (axisType.basicType == BasicType.DiversityGenoType ? individuum.getGenoType() : individuum.getPhenoType() ) );
+                
+                //we need a static random-type here, because we want to have a deterministic
+                return axisType.diversity.getDiversity(genInstances, staticRandom);
 
             default:
                 throw new AssertionError(axisType.basicType.name());
@@ -378,23 +404,25 @@ public class Graph2DLogger extends Logger {
 
     @Override
     public List <Attribute> getAttributes() {
-        return Utils.extendList( super.getAttributes(),  new Attribute(new AttributeType(Type.MainAttribute), "xAxis", xAxis),
+        return Utils.extendList( super.getAttributes(), new Attribute(new AttributeType(Type.MainAttribute), "xAxis", xAxis),
                                                         new Attribute(new AttributeType(Type.MainAttribute), "yAxis", yAxis),
                                                         new Attribute(new AttributeType(Type.TemporaryOrUnimportant), "startMicroTime", startMicroTime),
                                                         new Attribute(new AttributeType(Type.TemporaryOrUnimportant), "xValues", xValues),
-                                                        new Attribute(new AttributeType(Type.TemporaryOrUnimportant), "yValues", yValues));
+                                                        new Attribute(new AttributeType(Type.TemporaryOrUnimportant), "yValues", yValues),
+                                                        new Attribute(new AttributeType(Type.TemporaryOrUnimportant), "staticRandom", staticRandom));
     }
 
     /**
      * This class defines the type of the requested value for one axis
      */
-    public static class AxisType extends GenObject {
+    public static class AxisType extends GenObject {       
 
         /**
          * The basic-type: Measure the Time, Generation (or just every k'th generation), the average fitness
-         * or the average fitness of the k best or worst individuums or measure nothing but specify a name
+         * or the average fitness of the k best or worst individuums, measure nothing but specify a name or
+         * measure the diversity of the geno- or pheno-type
          */
-        protected enum BasicType {Time, KGeneration, AverageFitness, BestKFitnessAverage, WorstKFitnessAverage, JustName};
+        protected enum BasicType {Time, KGeneration, AverageFitness, BestKFitnessAverage, WorstKFitnessAverage, JustName, DiversityGenoType, DiversityPhenoType};
 
         /**
          * the basicType, see the javadoc of the BasicType for more information
@@ -424,6 +452,11 @@ public class Graph2DLogger extends Logger {
          * if it is not null, this will be the suggested name
          */
         protected final String individualName;
+        
+        /**
+         * just needed if basicType is DiversityGenoType or DiversityPhenoType
+         */
+        protected final AbstractDiversity diversity;
 
         /**
          * the constructor, should just be invoked of the static creation-methods.
@@ -434,12 +467,13 @@ public class Graph2DLogger extends Logger {
          * @param _kFitness Just the k'th best or worst individuums will count.
          * @param _individualName if it is not null, this will be the suggested name
          */
-        private AxisType (BasicType _basicType, double _timeFactor, int _kGenerations, int _kFitness, String _individualName) {
+        private AxisType (BasicType _basicType, double _timeFactor, int _kGenerations, int _kFitness, String _individualName, AbstractDiversity _diversity) {
             basicType = _basicType;
             timeFactor = _timeFactor;
             kGenerations = _kGenerations;
             kFitness = _kFitness;
             individualName = _individualName;
+            diversity = _diversity;
         }
 
         /**
@@ -480,10 +514,30 @@ public class Graph2DLogger extends Logger {
 
                 case JustName:
                     return individualName;
+                    
+                case DiversityGenoType:
+                    return "diversity of the genoType ('" + diversity.getName() + "')";
+                            
+                case DiversityPhenoType:
+                    return "diversity of the phenoType ('" + diversity.getName() + "')";
 
                 default:
                     throw new AssertionError(basicType.name());
             }
+        }
+        
+        /**
+         * do a compatibility check with the given algorithm
+         * 
+         * @param algorithm the algorithm
+         */
+        public void compatibilityCheck(GeneticAlgorithm algorithm) {
+            if (    basicType == BasicType.DiversityGenoType &&
+                    (algorithm.getGenoType() == null || !diversity.isCompatibleWith(algorithm.getGenoType())))
+                throw new GeneticRuntimeException("the chosen genoType is not compatible with the diversity logging in one axis.");
+            if (    basicType == BasicType.DiversityPhenoType &&
+                    (algorithm.getPhenoType() == null || !diversity.isCompatibleWith(algorithm.getPhenoType())))
+                throw new GeneticRuntimeException("the chosen phenoType is not compatible with the diversity logging in one axis.");
         }
 
         /**
@@ -492,7 +546,7 @@ public class Graph2DLogger extends Logger {
          * @return the requested axis-type
          */
         public static AxisType seconds () {
-            return new AxisType(BasicType.Time, 0.000001, -1, -1, null);
+            return new AxisType(BasicType.Time, 0.000001, -1, -1, null, null);
         }
 
         /**
@@ -501,7 +555,7 @@ public class Graph2DLogger extends Logger {
          * @return the requested axis-type
          */
         public static AxisType milliSeconds () {
-            return new AxisType(BasicType.Time, 0.001, -1, -1, null);
+            return new AxisType(BasicType.Time, 0.001, -1, -1, null, null);
         }
 
         /**
@@ -510,7 +564,7 @@ public class Graph2DLogger extends Logger {
          * @return the requested axis-type
          */
         public static AxisType microSeconds () {
-            return new AxisType(BasicType.Time, 1, -1, -1, null);
+            return new AxisType(BasicType.Time, 1, -1, -1, null, null);
         }
 
         /**
@@ -526,7 +580,7 @@ public class Graph2DLogger extends Logger {
             if (factorToSeconds < 0.0000001)
                 throw new IllegalArgumentException("microseconds is the minimum precision of the measuring. (factor should be >= 0.000001)");
 
-            return new AxisType(BasicType.Time, (0.000001/factorToSeconds), -1, -1, null);
+            return new AxisType(BasicType.Time, (0.000001/factorToSeconds), -1, -1, null, null);
         }
 
         /**
@@ -535,7 +589,7 @@ public class Graph2DLogger extends Logger {
          * @return the requested axis-type
          */
         public static AxisType generations () {
-            return new AxisType(BasicType.KGeneration, Double.NaN, 1, -1, null);
+            return new AxisType(BasicType.KGeneration, Double.NaN, 1, -1, null, null);
         }
 
         /**
@@ -550,7 +604,7 @@ public class Graph2DLogger extends Logger {
             if (kGenerations < 1)
                 throw new IllegalArgumentException("k has to be at least 1.");
 
-            return new AxisType(BasicType.KGeneration, Double.NaN, kGenerations, -1, null);
+            return new AxisType(BasicType.KGeneration, Double.NaN, kGenerations, -1, null, null);
         }
 
         /**
@@ -559,7 +613,7 @@ public class Graph2DLogger extends Logger {
          * @return the requested axis-type
          */
         public static AxisType averageFitness () {
-            return new AxisType(BasicType.AverageFitness, Double.NaN, -1, -1, null);
+            return new AxisType(BasicType.AverageFitness, Double.NaN, -1, -1, null, null);
         }
 
         /**
@@ -568,7 +622,7 @@ public class Graph2DLogger extends Logger {
          * @return the requested axis-type
          */
         public static AxisType bestFitness () {
-            return new AxisType(BasicType.BestKFitnessAverage, Double.NaN, -1, 1, null);
+            return new AxisType(BasicType.BestKFitnessAverage, Double.NaN, -1, 1, null, null);
         }
 
         /**
@@ -583,7 +637,7 @@ public class Graph2DLogger extends Logger {
             if (bestKFitness < 1)
                 throw new IllegalArgumentException("the best average fitness has to be calculated at least from 1 fitness.");
 
-            return new AxisType(BasicType.BestKFitnessAverage, Double.NaN, -1, bestKFitness, null);
+            return new AxisType(BasicType.BestKFitnessAverage, Double.NaN, -1, bestKFitness, null, null);
         }
 
         /**
@@ -592,7 +646,7 @@ public class Graph2DLogger extends Logger {
          * @return the requested axis-type
          */
         public static AxisType worstFitness () {
-            return new AxisType(BasicType.WorstKFitnessAverage, Double.NaN, -1, 1, null);
+            return new AxisType(BasicType.WorstKFitnessAverage, Double.NaN, -1, 1, null, null);
         }
 
         /**
@@ -607,7 +661,7 @@ public class Graph2DLogger extends Logger {
             if (worstKFitness < 1)
                 throw new IllegalArgumentException("the worst average fitness has to be calculated at least from 1 fitness.");
 
-            return new AxisType(BasicType.WorstKFitnessAverage, Double.NaN, -1, worstKFitness, null);
+            return new AxisType(BasicType.WorstKFitnessAverage, Double.NaN, -1, worstKFitness, null, null);
         }
 
         /**
@@ -622,7 +676,37 @@ public class Graph2DLogger extends Logger {
             if (name == null)
                 throw new NullPointerException("the name can't be null.");
 
-            return new AxisType(BasicType.JustName, Double.NaN, -1, -1, name);
+            return new AxisType(BasicType.JustName, Double.NaN, -1, -1, name, null);
+        }
+        
+        /**
+         * the creation-method for an axis, that will measure a diversity
+         * of the genoType
+         *
+         * @param _diversity the individual diversity
+         * @return the requested axis-type
+         * @throws NullPointerException if the parameter is null
+         */
+        public static AxisType diversityGenoType (AbstractDiversity _diversity) {
+            if (_diversity == null)
+                throw new NullPointerException("the diversity can't be null.");
+
+            return new AxisType(BasicType.DiversityGenoType, Double.NaN, -1, -1, null, _diversity);
+        }
+        
+        /**
+         * the creation-method for an axis, that will measure a diversity
+         * of the phenoType
+         *
+         * @param _diversity the individual diversity
+         * @return the requested axis-type
+         * @throws NullPointerException if the parameter is null
+         */
+        public static AxisType diversityPhenoType (AbstractDiversity _diversity) {
+            if (_diversity == null)
+                throw new NullPointerException("the diversity can't be null.");
+
+            return new AxisType(BasicType.DiversityPhenoType, Double.NaN, -1, -1, null, _diversity);
         }
 
         @Override
@@ -630,7 +714,9 @@ public class Graph2DLogger extends Logger {
             return Utils.createList( new Attribute(new AttributeType(Type.MainAttribute), "basicType", basicType),
                                     new Attribute(new AttributeType( (basicType == BasicType.Time ? Type.NormalAttribute : Type.TemporaryOrUnimportant) ), "timeFactor", timeFactor),
                                     new Attribute(new AttributeType( (basicType == BasicType.KGeneration ? Type.NormalAttribute : Type.TemporaryOrUnimportant) ), "kGenerations", kGenerations),
-                                    new Attribute(new AttributeType( (basicType == BasicType.BestKFitnessAverage || basicType == BasicType.WorstKFitnessAverage ? Type.NormalAttribute : Type.TemporaryOrUnimportant) ), "kFitness", kFitness));
+                                    new Attribute(new AttributeType( (basicType == BasicType.BestKFitnessAverage || basicType == BasicType.WorstKFitnessAverage ? Type.NormalAttribute : Type.TemporaryOrUnimportant) ), "kFitness", kFitness),
+                                    new Attribute(new AttributeType( (basicType == BasicType.JustName ? Type.NormalAttribute : Type.TemporaryOrUnimportant) ), "individualName", individualName),
+                                    new Attribute(new AttributeType( (basicType == BasicType.DiversityGenoType || basicType == BasicType.DiversityPhenoType ? Type.NormalAttribute : Type.TemporaryOrUnimportant) ), "diversity", diversity));
         }
 
     }

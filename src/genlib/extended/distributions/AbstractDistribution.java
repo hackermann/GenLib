@@ -71,7 +71,7 @@ public abstract class AbstractDistribution extends GenObject implements LongDist
      * @param measureQuantity this is the number of measurements, that will be done to create the plot
      * @param discreteBlocks the values of the x-axis will be grouped in this count of blocks
      * @return the requested PlotCollection
-     * @throws IllegalArgumentException if measurementQuantity or discreteBlocks is < 1
+     * @throws IllegalArgumentException if measurementQuantity or discreteBlocks is smaller than 1
      */
     public PlotCollection plotCollection (NumberType numberType, int measureQuantity, int discreteBlocks) {
         return PlotCollection.createBarChart(
@@ -101,7 +101,7 @@ public abstract class AbstractDistribution extends GenObject implements LongDist
      * @param measureQuantity this is the number of measurements, that will be done to create the plot
      * @param discreteBlocks the values of the x-axis will be grouped in this count of blocks
      * @return the requested Plot
-     * @throws IllegalArgumentException if measurementQuantity or discreteBlocks is < 1
+     * @throws IllegalArgumentException if measurementQuantity or discreteBlocks is smaller than 1
      */
     public Plot2DDiscreteX plot (NumberType numberType, int measureQuantity, int discreteBlocks) {
         if (measureQuantity < 1)
@@ -150,7 +150,7 @@ public abstract class AbstractDistribution extends GenObject implements LongDist
                 throw new AssertionError(numberType.name());
         }
     }
-    
+
     @Override
     public List<Attribute> getAttributes() {
         return Utils.createList();

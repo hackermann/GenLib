@@ -47,7 +47,7 @@ public interface RecombinationOp {
      * (so the operator has the ability to recombinate this
      * input length?)
      *
-     * @param representation the input-length
+     * @param size the input-length
      * @return true, if compatible
      */
     public boolean isInputSizeCompatible (int size);
@@ -57,7 +57,7 @@ public interface RecombinationOp {
      * (so the operator has the ability to give this number of
      * output instances, if requested)
      *
-     * @param representation the output-length
+     * @param size the output-length
      * @return true, if compatible
      */
     public boolean isOutputSizeCompatible (int size);

@@ -2,8 +2,6 @@
 Currently in work
 ===================
 
-diversity for population (avg distance between populations (calculated exactly and with random-examples) / shannon-entropy (page 62) / sub-string-entropy (page 63))
-
 
 
 =========
@@ -37,3 +35,11 @@ good forma: most of the formas should be dividable in smaller formas (as example
 improvement individuum A to B: 0 if B worse than A, otherwise: fitness(B)-fitness(A)
 relative expected improvement of mutation / recombination-operator (can be done every 10 or 20 generations with example-tests => adaptive algorithms)
 imagine operator (recombination /mutation) with a step-size: (a) constant step-size (b) step-size will be lowered with constant factor (c) adaptive: count of better solutions after operator vs count of worse solutions after operator (in last generation) > constant value => higher the step-size otherwise lower the step size (d) self-adaptive: additional information of stepsize in individdum, that will go through evolution too (as example with gauss-change)
+
+
+
+==========
+Done
+==========
+
+diversity for population (avg distance between populations (calculated exactly and with random-examples) / shannon-entropy (page 62) / sub-string-entropy (page 63))

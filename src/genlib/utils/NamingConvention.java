@@ -61,6 +61,8 @@ public abstract class NamingConvention extends GenObject {
 
     /**
      * get the global naming-convention
+     *
+     * @return the global naming-convention
      */
     public static NamingConvention getGlobalNamingConvention() {
         return namingConvention;
@@ -124,7 +126,7 @@ public abstract class NamingConvention extends GenObject {
          * @param _printAttributes How should the attributes of the objects be printed?
          * @param _maxLengthAttributes  the maximal print-length of a value of an attribute, as long as it is not another GenObject, -1 if there should be no bound
          * @throws NullPointerException if printClassName or printAttributes is null
-         * @throws IllegalArgumentException if maxLengthAttributes is wether -1 nor >= 1
+         * @throws IllegalArgumentException if maxLengthAttributes is whether -1 nor larger or equal than 1
          */
         public StandardNamingConvention (PrintClassName _printClassName, PrintAttributes _printAttributes, int _maxLengthAttributes) {
             if (_printClassName == null)

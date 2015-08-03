@@ -38,10 +38,8 @@ public class DistributionExampleMinimal {
 
     /**
      * the entry-point for this example
-     *
-     * @param args arguments (unused)
      */
-    public static void main (String [] args) {
+    public static void open () {
         GaussianDistribution distribution = new GaussianDistribution();
         Graph2D.open(distribution.plotCollection(NumberType.Double));
 

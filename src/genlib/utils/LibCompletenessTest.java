@@ -24,6 +24,7 @@
 
 package genlib.utils;
 
+import genlib.Main;
 import genlib.abstractrepresentation.GenObject;
 import genlib.abstractrepresentation.GenObject.Attribute;
 import genlib.abstractrepresentation.GenObject.AttributeType;
@@ -32,6 +33,7 @@ import genlib.abstractrepresentation.GeneticAlgorithm;
 import genlib.abstractrepresentation.GeneticAlgorithm.Individuum;
 import genlib.examples.DistributionExampleExtended;
 import genlib.examples.DistributionExampleMinimal;
+import genlib.examples.DiversityExample;
 import genlib.examples.ExampleViewer;
 import genlib.examples.GraphExampleExtended;
 import genlib.examples.GraphExampleMinimal;
@@ -84,49 +86,48 @@ import java.util.Set;
 /**
  * This class checks, whether the getAttributes() of all classes and subclasses
  * is complete and if every class, besides excluded ones, is a subclass of GenObject
- * 
+ *
  * @author Hilmar
  */
 public class LibCompletenessTest {
-    
+
     /**
      * instantiation not allowed
      */
     private LibCompletenessTest () {}
-    
+
     /**
      * returns all *.java-files in all the sub-directories of the root-directory
-     * 
+     *
      * @param prefix the prefix of the current package-names
      * @param directory the directory to search in
      * @return a list with all the strings in the form package1.package2.className
-     * @throws GeneticRuntimeException, if the root directory is not existing
      */
     protected static List <String> getAllJavaFilesInDirRecursive (String prefix, File directory) {
-        
+
         if (!directory.exists())
             throw new GeneticRuntimeException("direction not found: '" + directory.getAbsolutePath() + "'");
-                
+
         List <String> ret = new ArrayList();
         File [] subFiles = directory.listFiles();
         for (File subFile : subFiles) {
-            
+
             //directory => recursive call
-            if (subFile.isDirectory())               
+            if (subFile.isDirectory())
                 ret.addAll(getAllJavaFilesInDirRecursive( prefix + subFile.getName() + ".", subFile));
-            
+
             //otherwise, check if it is a java-file
             else if (subFile.getName().endsWith(".java"))
                 ret.add(prefix + subFile.getName().substring(0, subFile.getName().indexOf(".")));
         }
         return ret;
     }
-    
+
     /**
      * get all the declared fields (= attributes) of a class
-     * 
-     * @param cl
-     * @return 
+     *
+     * @param cl the class, we want to get the attributesfrom
+     * @return a set of all fields
      */
     protected static Set <Field> getAllDeclaredFieldsOfClass (Class cl) {
         Set <Field> ret = new HashSet();
@@ -134,27 +135,33 @@ public class LibCompletenessTest {
             if (    (field.getModifiers() & Modifier.STATIC) == 0 &&    //ignore static attributes
                     !field.isSynthetic())                               //as example a $this, if class is a subclass
                 ret.add(field);
-        
+
         //for fields of superclasses, we have to search bottom-up
         if (cl.getSuperclass() != null)
             ret.addAll(getAllDeclaredFieldsOfClass(cl.getSuperclass()));
-        
+
         return ret;
     }
-    
+
     /**
-     * the main-method of this class => do the completeness test
+     * the main-method of this class: do the completeness test
+     *
+     * @param sourcePath the path to the source-files
      */
-    protected static void doTest () {
-        
+    public static void doTest (String sourcePath) {
+
         try {
-            List <String> basicClasses = getAllJavaFilesInDirRecursive("", new File("src"));
+
+            //will be set to true, if the first error occurs
+            boolean errorOccured = false;
+
+            List <String> basicClasses = getAllJavaFilesInDirRecursive("", new File(sourcePath));
             Set <Class> newClasses = new HashSet();     //all classes, that may have further subclasses
             Set <Class> allClasses = new HashSet();     //all final classes of this library
 
             for (String className : basicClasses)
                 newClasses.add(Class.forName(className));
-            
+
             //search for subclasses
             while (newClasses.size() > 0) {
                 Class nextClass = newClasses.iterator().next();
@@ -165,13 +172,13 @@ public class LibCompletenessTest {
                     if (!newClasses.contains(cl) && !allClasses.contains(cl))
                         newClasses.add(cl);
             }
-            
+
             //if there is no standard-constructor (with 0 arguments), we need one instance of all these objects
             Map <Class, Object> noStandardConstructors = new HashMap();
             noStandardConstructors.put(Graph2DLogger.class, new Graph2DLogger(AxisType.averageFitness(), AxisType.averageFitness()));
             noStandardConstructors.put(LinearDistribution.class, new LinearDistribution(0,1));
             noStandardConstructors.put(StaticAlgorithmStep.class, new StaticAlgorithmStep(new StaticAlgorithmPass(1,1,1,0)));
-            noStandardConstructors.put(Graph2DLogger.Pt.class, new Graph2DLogger.Pt(0,0));           
+            noStandardConstructors.put(Graph2DLogger.Pt.class, new Graph2DLogger.Pt(0,0));
             noStandardConstructors.put(Plot2DContinuousX.class, new Plot2DContinuousX("title"));
             noStandardConstructors.put(Plot2DDiscreteX.class, new Plot2DDiscreteX("title"));
             noStandardConstructors.put(BooleanStaticLengthInstance.class, new BooleanStaticLengthInstance(new BooleanStaticLength(1), true));
@@ -181,7 +188,7 @@ public class LibCompletenessTest {
             noStandardConstructors.put(FloatStaticLengthInstance.class, new FloatStaticLengthInstance(new FloatStaticLength(1), 0));
             noStandardConstructors.put(IntStaticLengthInstance.class, new IntStaticLengthInstance(new IntStaticLength(1), 0));
             noStandardConstructors.put(LongStaticLengthInstance.class, new LongStaticLengthInstance(new LongStaticLength(1), 0));
-            noStandardConstructors.put(ShortStaticLengthInstance.class, new ShortStaticLengthInstance(new ShortStaticLength(1), (short)0));            
+            noStandardConstructors.put(ShortStaticLengthInstance.class, new ShortStaticLengthInstance(new ShortStaticLength(1), (short)0));
             noStandardConstructors.put(BooleanStaticLength.class, new BooleanStaticLength(1));
             noStandardConstructors.put(ByteStaticLength.class, new ByteStaticLength(1));
             noStandardConstructors.put(CharStaticLength.class, new CharStaticLength(1));
@@ -193,7 +200,7 @@ public class LibCompletenessTest {
             noStandardConstructors.put(StaticAlgorithmPass.class, new StaticAlgorithmPass(1,1,1,0));
             noStandardConstructors.put(AttributeType.class, new AttributeType(Type.MainAttribute));
             noStandardConstructors.put(PopulationLogging.class, PopulationLogging.populationLogAll());
-            noStandardConstructors.put(KPointCrossover.class, new KPointCrossover(1));            
+            noStandardConstructors.put(KPointCrossover.class, new KPointCrossover(1));
             noStandardConstructors.put(AxisType.class, AxisType.averageFitness());
             noStandardConstructors.put(Attribute.class, new Attribute(new AttributeType(Type.MainAttribute), "attr", 0));
             noStandardConstructors.put(PlotCollection.class, PlotCollection.createBarChart("title", "xAxis", "yAxis", 0, true, true, new Plot2DDiscreteX("title")));
@@ -201,7 +208,7 @@ public class LibCompletenessTest {
             gA.setGenoToPhenoOp(new GenoToPhenoIdentity());
             gA.setFitnessOp(new AverageFitness());
             noStandardConstructors.put(Individuum.class, gA.new Individuum(new BooleanStaticLengthInstance(new BooleanStaticLength(1), true), new StaticAlgorithmStep(new StaticAlgorithmPass(1,1,1,0))));
-            
+
             //All the special classes, who are no subclasses of GenObject
             Set <Class> ignoredClasses = new HashSet();
             ignoredClasses.add(Utils.class);
@@ -218,66 +225,70 @@ public class LibCompletenessTest {
             ignoredClasses.add(BasicTypeDistributions.class);
             ignoredClasses.add(LibCompletenessTest.class);
             ignoredClasses.add(Graph2D.class);
-            
+            ignoredClasses.add(Main.class);
+            ignoredClasses.add(CountingMap.class);
+            ignoredClasses.add(DiversityExample.class);
+
             for (Class cl : allClasses) {
                 if (    ignoredClasses.contains(cl) ||                      //ignored class, because it is no subclass of GenObject on purpose
                         cl.isInterface() ||                                 //interfaces are ignored
                         cl.isEnum() ||                                      //enums create classes too => ignore them
                         (cl.getModifiers() & Modifier.ABSTRACT) != 0)       //abstract classes are ignored
                     continue;
-                
+
                 //still no subclass of GenObject => error
-                if (!GenObject.class.isAssignableFrom(cl))
-                    System.err.println("Warning: class is not inherited from GenObject: '" + cl + "'");
-                
+                if (!GenObject.class.isAssignableFrom(cl)) {
+                    System.err.println("Error: class is not inherited from GenObject: '" + cl + "'");
+                    errorOccured = true;
+                }
+
                 else {
                     try {
                         Method method = cl.getMethod("getAttributes");
                         List<Attribute> attributes = null;
-                        
+
                         //we don't have a standard-constructor, use the special instantiated class
                         if (noStandardConstructors.containsKey(cl))
-                            attributes = (List<Attribute>)method.invoke(noStandardConstructors.get(cl));                                                
+                            attributes = (List<Attribute>)method.invoke(noStandardConstructors.get(cl));
                         else
                             attributes = (List<Attribute>)method.invoke(cl.newInstance());
-                        
+
                         //keys are all the strings, the invoked method returns
                         Set <String> keys = new HashSet();
                         for (Attribute attr : attributes)
                             keys.add(attr.getKey());
-                        
+
                         //go through all expected fields => write error if one not found
-                        for (Field field : getAllDeclaredFieldsOfClass(cl)) 
-                            if (!keys.remove(field.getName()))
-                                System.err.println("Warning: There is a key missing in getAttributes in class '" + cl + "' (name of field: '" + field.getName() + "')");
-                        
+                        for (Field field : getAllDeclaredFieldsOfClass(cl))
+                            if (!keys.remove(field.getName())) {
+                                System.err.println("Error: There is a key missing in getAttributes in class '" + cl + "' (name of field: '" + field.getName() + "')");
+                                errorOccured = true;
+                            }
+
                         //keys still left => write error too
-                        for (String key : keys)
-                            System.err.println("Warning: There is a key of an unknown attribute in getAttributes in class '" + cl + "' (name of field: '" + key + "')");
-                        
+                        for (String key : keys) {
+                            System.err.println("Error: There is a key of an unknown attribute in getAttributes in class '" + cl + "' (name of field: '" + key + "')");
+                            errorOccured = true;
+                        }
+
                     } catch (Exception e) {
-                        
+
                         //we can't instantiate a class? She probably has no standard-constructor
-                        if (e instanceof java.lang.InstantiationException)
-                            System.err.println("Warning: No standard-constructor available: '" + cl + "'");
-                        else
+                        if (e instanceof java.lang.InstantiationException) {
+                            System.err.println("Error: No standard-constructor available: '" + cl + "'");
+                            errorOccured = true;
+                        } else
                             throw new GeneticRuntimeException(e);
                     }
-                }              
+                }
             }
-            
+
+            if (!errorOccured)
+                System.out.println("Lib Completeness Test completed. No errors.");
+
         } catch (ClassNotFoundException e) {
             throw new GeneticRuntimeException(e);
         }
     }
-    
-    /**
-     * the main-entry-point of this testing routine
-     * 
-     * @param args the arguments are ignored
-     */
-    public static void main (String [] args) {
-        doTest();
-    }
-    
+
 }

@@ -40,10 +40,8 @@ public class GraphExampleExtended {
 
     /**
      * the entry-point for this example
-     *
-     * @param args arguments (unused)
      */
-    public static void main (String [] args) {
+    public static void open () {
 
         //a standard genetic algorithm, the optimization-task is a standard example and not important for this example
         StaticGeneticAlgorithm algorithm = new StaticGeneticAlgorithm();

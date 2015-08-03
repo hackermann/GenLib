@@ -56,3 +56,7 @@ good documentation available. Please have a look at the javadoc annotations.
 Editing is restricted for collaborators only, so if you are interested in
 collaborating, please contact me via git-hub:
 https://github.com/hackermann/GenLib
+
+If you want to use a Netbeans "build.xml", just rename the "netbeans_build.xml"
+to "build.xml". This build-script builds additionaly a java-doc jar and does
+at the end the lib-completeness-test.

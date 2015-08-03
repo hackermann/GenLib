@@ -55,6 +55,7 @@ public class ExampleViewer extends javax.swing.JFrame {
         jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
         jButton5 = new javax.swing.JButton();
+        jButton6 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("ExampleViewer");
@@ -101,6 +102,13 @@ public class ExampleViewer extends javax.swing.JFrame {
             }
         });
 
+        jButton6.setText("Example 6 (Diversity Graph)");
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton6ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -120,7 +128,8 @@ public class ExampleViewer extends javax.swing.JFrame {
                             .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 267, Short.MAX_VALUE)
-                            .addComponent(jButton5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addComponent(jButton5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jButton6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap(23, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -142,7 +151,9 @@ public class ExampleViewer extends javax.swing.JFrame {
                 .addComponent(jButton4)
                 .addGap(18, 18, 18)
                 .addComponent(jButton5)
-                .addContainerGap(39, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(jButton6)
+                .addContainerGap(49, Short.MAX_VALUE))
         );
 
         pack();
@@ -154,7 +165,7 @@ public class ExampleViewer extends javax.swing.JFrame {
      * @param evt the click-event
      */
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        StandardExampleMinimal.main(null);
+        StandardExampleMinimal.open();
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
@@ -163,7 +174,7 @@ public class ExampleViewer extends javax.swing.JFrame {
      * @param evt the click-event
      */
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        GraphExampleMinimal.main(null);
+        GraphExampleMinimal.open();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
@@ -172,21 +183,40 @@ public class ExampleViewer extends javax.swing.JFrame {
      * @param evt the click-event
      */
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        GraphExampleExtended.main(null);
+        GraphExampleExtended.open();
     }//GEN-LAST:event_jButton3ActionPerformed
 
+    /**
+     * if clicked on button
+     *
+     * @param evt the click-event
+     */
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        DistributionExampleMinimal.main(null);
+        DistributionExampleMinimal.open();
     }//GEN-LAST:event_jButton4ActionPerformed
 
+    /**
+     * if clicked on button
+     *
+     * @param evt the click-event
+     */
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-        DistributionExampleExtended.main(null);
+        DistributionExampleExtended.open();
     }//GEN-LAST:event_jButton5ActionPerformed
 
     /**
-     * @param args the command line arguments
+     * if clicked on button
+     *
+     * @param evt the click-event
      */
-    public static void main(String args[]) {
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+        DiversityExample.open();
+    }//GEN-LAST:event_jButton6ActionPerformed
+
+    /**
+     * opens the example-viewer
+     */
+    public static void open() {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -224,6 +254,7 @@ public class ExampleViewer extends javax.swing.JFrame {
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
+    private javax.swing.JButton jButton6;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

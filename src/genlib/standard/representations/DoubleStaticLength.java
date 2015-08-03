@@ -33,6 +33,7 @@ import genlib.standard.representations.AnyTypeStaticLength.AnyLongStaticLength;
 import genlib.standard.representations.AnyTypeStaticLength.AnyTypeStaticLengthInstance.AnyDoubleStaticLengthInstance;
 import genlib.standard.representations.AnyTypeStaticLength.AnyTypeStaticLengthInstance.AnyLongStaticLengthInstance;
 import genlib.utils.Utils;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -93,7 +94,7 @@ public class DoubleStaticLength extends AnyDoubleStaticLength {
             randomArray[i] = getRandomDouble(step.getRandom());
         return new DoubleStaticLengthInstance(this, randomArray);
     }
-    
+
     @Override
     public List<Attribute> getAttributes() {
         return Utils.extendList( super.getAttributes(), new Attribute(new AttributeType(AttributeType.Type.MainAttribute), "distribution", distribution) );
@@ -144,6 +145,11 @@ public class DoubleStaticLength extends AnyDoubleStaticLength {
         @Override
         public List<Attribute> getAttributes() {
             return Utils.extendList( super.getAttributes(), new Attribute(new AttributeType(AttributeType.Type.MainAttribute), "array", array) );
+        }
+
+        @Override
+        public int hashCode () {
+            return Arrays.hashCode(array);
         }
 
     }

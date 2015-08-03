@@ -22,37 +22,57 @@
  * THE SOFTWARE.
  */
 
-package genlib.examples;
+package genlib.utils;
 
-import genlib.output.Graph2DLogger;
-import genlib.output.Graph2DLogger.AxisType;
-import genlib.output.TextLogger;
-import genlib.standard.algorithms.StaticGeneticAlgorithm;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
- * A minimal example, how to do an graphical output with a plot.
+ * With every insert of a value, this map counts the occurence
+ * of this value.
  *
  * @author Hilmar
  */
-public class GraphExampleMinimal {
+public class CountingMap <E> {
 
     /**
-     * the entry-point for this example
+     * the internal representation of the map
      */
-    public static void open () {
+    protected final Map <E, Integer> countMap = new HashMap();
 
-        //a standard genetic algorithm, the optimization-task is a standard example and not important for this example
-        StaticGeneticAlgorithm algorithm = new StaticGeneticAlgorithm();
+    /**
+     * insert a value
+     *
+     * @param entry the value
+     */
+    public void add (E entry) {
+        if (countMap.containsKey(entry))
+            countMap.put(entry, countMap.get(entry)+1);
+        else
+            countMap.put(entry, 1);
+    }
 
-        //first we need a logger, to log our data: In this case we will log the generation (x-axis) vs the average fitness (y-axis)
-        Graph2DLogger graphLogger = new Graph2DLogger(AxisType.generations(), AxisType.averageFitness());
+    /**
+     * how often was this value inserted?
+     *
+     * @param entry the value
+     * @return the number of inserts of this value, 0 if it never got added
+     */
+    public int getCount (E entry) {
+        if (countMap.containsKey(entry))
+            return countMap.get(entry);
+        else
+            return 0;
+    }
 
-        //run the algorithm, run with a text-logger additionally
-        algorithm.run(new TextLogger(), graphLogger);
-
-        //now we can open a window with our graph
-        graphLogger.createGraph2D();
-
+    /**
+     * the key-set of all values, that got added at least 1 time
+     *
+     * @return the key-set
+     */
+    public Set <E> keySet () {
+        return countMap.keySet();
     }
 
 }

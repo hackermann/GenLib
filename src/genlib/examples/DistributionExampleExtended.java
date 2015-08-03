@@ -40,10 +40,8 @@ public class DistributionExampleExtended {
 
     /**
      * the entry-point for this example
-     *
-     * @param args arguments (unused)
      */
-    public static void main (String [] args) {
+    public static void open () {
 
         //create some distributions first, they all start with -256 and end with 256 (the gaussian-distributions just approximately)
         LinearDistribution linearDistribution = new LinearDistribution(-256, 256);

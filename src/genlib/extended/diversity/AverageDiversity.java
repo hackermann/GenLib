@@ -37,63 +37,63 @@ import java.util.List;
 /**
  * This diversity-operator calculates the diversity, through an average distance
  * of individuums in the population
- * 
+ *
  * @author Hilmar
  */
 public class AverageDiversity extends AbstractDiversity {
-    
+
     /**
      * this operator calculates the distance between two individuums
      */
     protected final IndividuumDistanceOp distanceOp;
-    
+
     /**
      * the constructor
      */
     public AverageDiversity() {
         this(new StandardDistanceOp());
-    }        
-    
+    }
+
     /**
      * the constructor
-     * 
+     *
      * @param _distanceOp the operator, which calculates the distance between two individuums
      * @throws NullPointerException if distanceOp is null
-     * 
+     *
      */
     public AverageDiversity(IndividuumDistanceOp _distanceOp) {
         super();
-        
+
         if (_distanceOp == null)
             throw new NullPointerException("_distanceOp cannot be null.");
-        
+
         distanceOp = _distanceOp;
     }
-    
+
     /**
      * the constructor
-     * 
+     *
      * @param _percentPopulation the percent of a population, we do the diversity measuring with. The individuums will be chosen randomly.
-     * @throws IllegalArgumentException, if percentPopulation is not between 0 and 1 or equal to 0
+     * @throws IllegalArgumentException if percentPopulation is not between 0 and 1 or equal to 0
      */
     public AverageDiversity (double _percentPopulation) {
         this (new StandardDistanceOp(), _percentPopulation);
     }
-    
+
     /**
      * the constructor
-     * 
+     *
      * @param _distanceOp the operator, which calculates the distance between two individuums
      * @param _percentPopulation the percent of a population, we do the diversity measuring with. The individuums will be chosen randomly.
-     * @throws IllegalArgumentException, if percentPopulation is not between 0 and 1 or equal to 0
+     * @throws IllegalArgumentException if percentPopulation is not between 0 and 1 or equal to 0
      * @throws NullPointerException if distanceOp is null
      */
     public AverageDiversity (IndividuumDistanceOp _distanceOp, double _percentPopulation) {
         super(_percentPopulation);
-        
+
         if (_distanceOp == null)
             throw new NullPointerException("_distanceOp cannot be null.");
-        
+
         distanceOp = _distanceOp;
     }
 
@@ -101,57 +101,57 @@ public class AverageDiversity extends AbstractDiversity {
     protected double calculateDiversity(List<GenInstance> population) {
         if (population.size() <= 1)
             return 0;
-        
+
         double sum = 0;
         for (int i=0; i<population.size(); i++)
             for (int j=i+1; j<population.size(); j++)
                 sum += distanceOp.distanceOp(population.get(i), population.get(j));
-        
+
         return sum / (population.size()*(population.size()-1));
     }
 
     @Override
     public boolean isCompatibleWith(GenRepresentation representation) {
-        return (distanceOp.isCompatibleWith(representation));            
+        return (distanceOp.isCompatibleWith(representation));
     }
-    
+
     @Override
     public String getName() {
         return "average diversity";
     }
-    
+
     @Override
     public List <Attribute> getAttributes() {
         return Utils.extendList( super.getAttributes(), new Attribute(new AttributeType(Type.MainAttribute), "distanceOp", distanceOp));
     }
-    
+
     /**
      * an operator, that calculates a distance between two individuums
      */
     public static abstract class IndividuumDistanceOp extends GenObject {
-        
+
         /**
          * the actual operator
-         * 
+         *
          * @param i1 the left individuum
          * @param i2 the right individuum
          * @return the calculated distance
          */
         public abstract double distanceOp (GenInstance i1, GenInstance i2);
-        
+
         /**
          * Is this operator compatible with this representation
-         * 
+         *
          * @param representation the representation
          * @return true, if compatible
          */
         public abstract boolean isCompatibleWith (GenRepresentation representation);
-        
+
         @Override
         public List <Attribute> getAttributes() {
             return Utils.createList();
         }
-        
+
         /**
          * a standard-implementation for the individuum-distance-operator
          */
@@ -173,9 +173,9 @@ public class AverageDiversity extends AbstractDiversity {
             public boolean isCompatibleWith(GenRepresentation representation) {
                 return representation instanceof AnyTypeStaticLength;
             }
-            
+
         }
-        
+
     }
-    
+
 }

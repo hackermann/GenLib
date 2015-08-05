@@ -66,29 +66,6 @@ public class KPointCrossover extends GenObject implements RecombinationOp {
 
     @Override
     public GenInstance[] recombinationOp(GenInstance[] input, AlgorithmStep step, int outputSize) {
-        /*if (input.length == 1)
-            return input;
-        else {
-            BinaryStaticLength representation = ((BinaryStaticLength)((BinaryStaticLengthInstance)input[0]).getRepresentation());
-            int length = representation.getLength();
-
-            List <Integer> crossoverPoints = new ArrayList(k);
-            for (int i=0; i<k; i++)
-                crossoverPoints.add(step.getRandom().nextInt( length ));
-            Collections.sort(crossoverPoints);
-
-            boolean [] result = new boolean[length];
-            boolean odd = false;
-            crossoverPoints.add(-1);
-            for (int i=0; i<length; i++) {
-                while (crossoverPoints.get(0) == i) {
-                    odd = !odd;
-                    crossoverPoints.remove(0);
-                }
-                result[i] = ((BinaryStaticLengthInstance)input[(odd ? 1 : 0)]).isSet(i);
-            }
-            return new GenInstance[] {new BinaryStaticLengthInstance(representation, result)};
-        }*/
 
         if (input.length == 1)
             return input;
@@ -96,6 +73,7 @@ public class KPointCrossover extends GenObject implements RecombinationOp {
             AnyTypeStaticLength representation = ((AnyTypeStaticLength)((AnyTypeStaticLengthInstance)input[0]).getRepresentation());
             int length = representation.getLength();
 
+            //get random crossover-points and sort them
             List <Integer> crossoverPoints = new ArrayList(k);
             for (int i=0; i<k; i++)
                 crossoverPoints.add(step.getRandom().nextInt( length ));
@@ -107,7 +85,10 @@ public class KPointCrossover extends GenObject implements RecombinationOp {
                 resultLong = new long[length];
             else
                 resultDouble = new double[length];
+
+            //odd defines, if we currently read in the first or in the second instance
             boolean odd = false;
+            //let's add a pseudo-point, so the list will be never empty and .get(0) won't throw an exception
             crossoverPoints.add(-1);
             for (int i=0; i<length; i++) {
                 while (crossoverPoints.get(0) == i) {
@@ -121,6 +102,7 @@ public class KPointCrossover extends GenObject implements RecombinationOp {
             }
             return new GenInstance[] { representation.isLongType() ? representation.instantiateFromLongs(resultLong) : representation.instantiateFromDoubles(resultDouble)};
         }
+
     }
 
     @Override

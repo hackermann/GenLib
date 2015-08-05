@@ -39,6 +39,8 @@ import genlib.examples.GraphExampleExtended;
 import genlib.examples.GraphExampleMinimal;
 import genlib.examples.StandardExampleMinimal;
 import genlib.extended.distributions.BasicTypeDistributions;
+import genlib.extended.distributions.BasicTypeDistributions.MinMaxDouble;
+import genlib.extended.distributions.BasicTypeDistributions.MinMaxLong;
 import genlib.extended.distributions.LinearDistribution;
 import genlib.output.Graph2DLogger;
 import genlib.output.Graph2DLogger.AxisType;
@@ -50,6 +52,7 @@ import genlib.output.gui.Graph2D.PlotCollection;
 import genlib.standard.algorithms.StaticAlgorithmPass;
 import genlib.standard.algorithms.StaticAlgorithmStep;
 import genlib.standard.algorithms.StaticGeneticAlgorithm;
+import genlib.standard.operators.ArithmeticRecombination;
 import genlib.standard.operators.AverageFitness;
 import genlib.standard.operators.GenoToPhenoIdentity;
 import genlib.standard.operators.KPointCrossover;
@@ -208,6 +211,9 @@ public class LibCompletenessTest {
             gA.setGenoToPhenoOp(new GenoToPhenoIdentity());
             gA.setFitnessOp(new AverageFitness());
             noStandardConstructors.put(Individuum.class, gA.new Individuum(new BooleanStaticLengthInstance(new BooleanStaticLength(1), true), new StaticAlgorithmStep(new StaticAlgorithmPass(1,1,1,0))));
+            noStandardConstructors.put(MinMaxLong.class, new MinMaxLong(0,1));
+            noStandardConstructors.put(MinMaxDouble.class, new MinMaxDouble(0,1));
+            noStandardConstructors.put(ArithmeticRecombination.class, new ArithmeticRecombination(0.5));
 
             //All the special classes, who are no subclasses of GenObject
             Set <Class> ignoredClasses = new HashSet();

@@ -116,6 +116,24 @@ public abstract class AnyTypeStaticLength extends GenRepresentation {
     public abstract double getRandomDouble(Random random);
 
     /**
+     * converts a given long value in a long value in bounds (compatible with this
+     * static-length-type)
+     *
+     * @param value the input value
+     * @return the value in bounds
+     */
+    public abstract long applyBounds(long value);
+
+    /**
+     * converts a given double value in a double value in bounds (compatible with this
+     * static-length-type)
+     *
+     * @param value the input value
+     * @return the value in bounds
+     */
+    public abstract double applyBounds(double value);
+
+    /**
      * this class represents AnyTypeStaticLength, when the basic type of
      * the array is a long
      */
@@ -146,6 +164,11 @@ public abstract class AnyTypeStaticLength extends GenRepresentation {
         @Override
         public double getRandomDouble(Random random) {
             return (double)getRandomLong(random);
+        }
+
+        @Override
+        public double applyBounds(double value) {
+            return applyBounds((long)value);
         }
 
     }
@@ -181,6 +204,11 @@ public abstract class AnyTypeStaticLength extends GenRepresentation {
         @Override
         public long getRandomLong(Random random) {
             return (long)getRandomDouble(random);
+        }
+
+        @Override
+        public long applyBounds(long value) {
+            return (long)applyBounds((double)value);
         }
 
     }

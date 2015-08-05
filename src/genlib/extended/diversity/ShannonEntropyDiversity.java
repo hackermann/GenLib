@@ -72,7 +72,7 @@ public class ShannonEntropyDiversity extends AbstractDiversity {
             for (GenInstance instance : population)
                 countMap.add( ((AnyTypeStaticLengthInstance)instance).getDoubleValue(i) );
 
-            //calculate the entropy, we subtract the values, because the entropy has to become smaller, if the sum of this index is big
+            //calculate the entropy, we subtract the values, because the log() will always have a negative value
             for (Double entry : countMap.keySet()) {
                 double percentOccurence = (double)countMap.getCount(entry) / population.size();
                 sum -= percentOccurence * Math.log(percentOccurence);

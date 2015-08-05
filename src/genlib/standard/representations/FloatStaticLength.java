@@ -97,7 +97,12 @@ public class FloatStaticLength extends AnyDoubleStaticLength {
             randomArray[i] = distribution.getRandomFloat(step.getRandom());
         return new FloatStaticLengthInstance(this, randomArray);
     }
-    
+
+    @Override
+    public double applyBounds(double value) {
+        return distribution.getMinMaxDouble().applyBounds(value);
+    }
+
     @Override
     public List<Attribute> getAttributes() {
         return Utils.extendList( super.getAttributes(), new Attribute(new AttributeType(AttributeType.Type.MainAttribute), "distribution", distribution) );

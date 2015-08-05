@@ -96,6 +96,11 @@ public class DoubleStaticLength extends AnyDoubleStaticLength {
     }
 
     @Override
+    public double applyBounds(double value) {
+        return distribution.getMinMaxDouble().applyBounds(value);
+    }
+
+    @Override
     public List<Attribute> getAttributes() {
         return Utils.extendList( super.getAttributes(), new Attribute(new AttributeType(AttributeType.Type.MainAttribute), "distribution", distribution) );
     }

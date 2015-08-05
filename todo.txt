@@ -3,7 +3,6 @@ Currently in work
 ===================
 
 
-
 =========
 TODO
 =========
@@ -20,7 +19,6 @@ different genetic-algorithms (complete replacing of parent-population, end after
 maybe abstract selection-requirements: multiple selection allowed / not allowed (duplicate-free), number of wished selection-individuums (static number / at least .. / at most ..)
 overlap-factor (how much individuums are in new poplation from the parent-generation?): replace worst/oldest/random parents
 selection-intensity (page 70)
-uniform-crossover (every entry has 1/2 probability of left or right) / interpolational recombination (static random interpolation, random for every entry) / extrapolational recombination
 OR-operators (with probability per child operator)
 multiple-recombination-output (just for non-deterministic childs), just execute child multiple times (maybe with a RandomNto1-abstract-operator (non-deterministic and n input, 1 output))
 **
@@ -43,3 +41,4 @@ Done
 ==========
 
 diversity for population (avg distance between populations (calculated exactly and with random-examples) / shannon-entropy (page 62) / sub-string-entropy (page 63))
+uniform-crossover (every entry has 1/2 probability of left or right) / interpolational recombination (static random interpolation, random for every entry) / extrapolational recombination

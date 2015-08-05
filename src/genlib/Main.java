@@ -25,8 +25,6 @@
 package genlib;
 
 import genlib.examples.ExampleViewer;
-import genlib.standard.representations.DoubleStaticLength;
-import genlib.standard.representations.DoubleStaticLength.DoubleStaticLengthInstance;
 import genlib.utils.LibCompletenessTest;
 import java.util.Arrays;
 

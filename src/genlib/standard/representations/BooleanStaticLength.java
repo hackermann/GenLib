@@ -70,6 +70,11 @@ public class BooleanStaticLength extends AnyLongStaticLength {
         return new BooleanStaticLengthInstance(this, randomArray);
     }
 
+    @Override
+    public long applyBounds(long value) {
+        return (value <= 0 ? 0 : 1);
+    }
+
     /**
      * this class represents an BooleanStaticLength - instance
      */

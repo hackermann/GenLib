@@ -25,6 +25,8 @@
 package genlib.extended.distributions;
 
 import genlib.abstractrepresentation.GenObject.AttributeType.Type;
+import genlib.extended.distributions.BasicTypeDistributions.MinMaxDouble;
+import genlib.extended.distributions.BasicTypeDistributions.MinMaxLong;
 import genlib.utils.Utils;
 import java.util.List;
 import java.util.Random;
@@ -36,7 +38,7 @@ import java.util.Random;
  *
  * @author Hilmar
  */
-public class GaussianDistribution extends AbstractDistribution {        
+public class GaussianDistribution extends AbstractDistribution {
 
     /**
      * the center of the gaussian distribution
@@ -196,7 +198,19 @@ public class GaussianDistribution extends AbstractDistribution {
     public float getRandomFloat(Random random) {
         return (float)getRandomDouble(random);
     }
-    
+
+    @Override
+    public MinMaxLong getMinMaxLong () {
+        return getMinMaxDouble().toMinMaxLong();
+    }
+
+    @Override
+    public MinMaxDouble getMinMaxDouble () {
+        double leftBound = (Double.isNaN(maxLeft) ? Double.NEGATIVE_INFINITY : center - maxLeft);
+        double rightBound = (Double.isNaN(maxRight) ? Double.POSITIVE_INFINITY : center + maxRight);
+        return new MinMaxDouble(leftBound, rightBound);
+    }
+
     @Override
     public List<Attribute> getAttributes() {
         return Utils.extendList(super.getAttributes(),

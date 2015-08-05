@@ -25,6 +25,8 @@
 package genlib.extended.distributions;
 
 import genlib.abstractrepresentation.GenObject.AttributeType.Type;
+import genlib.extended.distributions.BasicTypeDistributions.MinMaxDouble;
+import genlib.extended.distributions.BasicTypeDistributions.MinMaxLong;
 import genlib.utils.Utils;
 import java.util.List;
 import java.util.Random;
@@ -36,7 +38,7 @@ import java.util.Random;
  *
  * @author Hilmar
  */
-public class LinearDistribution extends AbstractDistribution {       
+public class LinearDistribution extends AbstractDistribution {
 
     /**
      * the minimum and maximum value, saved as long
@@ -96,8 +98,8 @@ public class LinearDistribution extends AbstractDistribution {
 
         minD = _min;
         maxD = _max;
-        minL = (long)minD;
-        maxL = (long)maxD;
+        minL = (long)Math.floor(minD);
+        maxL = Math.round(maxD);
     }
 
     /**
@@ -114,8 +116,8 @@ public class LinearDistribution extends AbstractDistribution {
             maxD = 0;
             minD = bound;
         }
-        minL = (long)minD;
-        maxL = (long)maxD;
+        minL = (long)Math.floor(minD);
+        maxL = Math.round(maxD);
     }
 
     @Override
@@ -177,6 +179,16 @@ public class LinearDistribution extends AbstractDistribution {
     @Override
     public float getRandomFloat(Random random) {
         return (float)(random.nextFloat()*(maxD-minD)+minD);
+    }
+
+    @Override
+    public MinMaxLong getMinMaxLong() {
+        return new MinMaxLong(minL, maxL);
+    }
+
+    @Override
+    public MinMaxDouble getMinMaxDouble() {
+        return new MinMaxDouble(minD, maxD);
     }
 
     @Override

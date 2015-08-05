@@ -24,6 +24,10 @@
 
 package genlib.extended.distributions;
 
+import genlib.abstractrepresentation.GenObject;
+import genlib.abstractrepresentation.GenObject.AttributeType.Type;
+import genlib.utils.Utils;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -51,6 +55,14 @@ public class BasicTypeDistributions {
          */
         public long getRandomLong(Random random);
 
+        /**
+         * returns the minimum possible value and the maximum possible
+         * value of this distribution
+         *
+         * @return the minimum and maximum values
+         */
+        public MinMaxLong getMinMaxLong();
+
     }
 
     /**
@@ -65,6 +77,14 @@ public class BasicTypeDistributions {
          * @return the requested random-number
          */
         public int getRandomInt(Random random);
+
+        /**
+         * returns the minimum possible value and the maximum possible
+         * value of this distribution
+         *
+         * @return the minimum and maximum values
+         */
+        public MinMaxLong getMinMaxLong();
 
     }
 
@@ -81,6 +101,14 @@ public class BasicTypeDistributions {
          */
         public short getRandomShort(Random random);
 
+        /**
+         * returns the minimum possible value and the maximum possible
+         * value of this distribution
+         *
+         * @return the minimum and maximum values
+         */
+        public MinMaxLong getMinMaxLong();
+
     }
 
     /**
@@ -95,6 +123,14 @@ public class BasicTypeDistributions {
          * @return the requested random-number
          */
         public char getRandomChar(Random random);
+
+        /**
+         * returns the minimum possible value and the maximum possible
+         * value of this distribution
+         *
+         * @return the minimum and maximum values
+         */
+        public MinMaxLong getMinMaxLong();
 
     }
 
@@ -111,6 +147,14 @@ public class BasicTypeDistributions {
          */
         public byte getRandomByte(Random random);
 
+        /**
+         * returns the minimum possible value and the maximum possible
+         * value of this distribution
+         *
+         * @return the minimum and maximum values
+         */
+        public MinMaxLong getMinMaxLong();
+
     }
 
     /**
@@ -126,6 +170,14 @@ public class BasicTypeDistributions {
          */
         public double getRandomDouble(Random random);
 
+        /**
+         * returns the minimum possible value and the maximum possible
+         * value of this distribution
+         *
+         * @return the minimum and maximum values
+         */
+        public MinMaxDouble getMinMaxDouble();
+
     }
 
     /**
@@ -140,6 +192,184 @@ public class BasicTypeDistributions {
          * @return the requested random-number
          */
         public float getRandomFloat(Random random);
+
+        /**
+         * returns the minimum possible value and the maximum possible
+         * value of this distribution
+         *
+         * @return the minimum and maximum values
+         */
+        public MinMaxDouble getMinMaxDouble();
+
+    }
+
+    /**
+     * a representation for a long minimum and a long maximum value
+     */
+    public static class MinMaxLong extends GenObject {
+
+        /**
+         * the minimum and maximum values
+         */
+        protected final long min, max;
+
+        /**
+         * the constructor
+         *
+         * @param _min the minimum
+         * @param _max the maximum
+         * @throws IllegalArgumentException if max is smaller than min
+         */
+        public MinMaxLong (long _min, long _max) {
+            if (_max < _min)
+                throw new IllegalArgumentException("max has to be >= min.");
+
+            min = _min;
+            max = _max;
+        }
+
+        /**
+         * return the minimum
+         *
+         * @return the minimum
+         */
+        public long getMin () {
+            return min;
+        }
+
+        /**
+         * return the maximum
+         *
+         * @return the maximum
+         */
+        public long getMax () {
+            return max;
+        }
+
+        /**
+         * is the given value in the bounds?
+         *
+         * @param value the input value
+         * @return true, if it is in bounds
+         */
+        public boolean inBounds(long value) {
+            return (value >= min && value <= max);
+        }
+
+        /**
+         * apply the bounds to the given value
+         *
+         * @param value the input value
+         * @return the value, in bounds
+         */
+        public long applyBounds(long value) {
+            if (value < min)
+                return min;
+            if (value > max)
+                return max;
+            return value;
+        }
+
+        /**
+         * converts this MinMaxLong to a MinMaxDouble
+         *
+         * @return the requested MinMaxDouble
+         */
+        public MinMaxDouble toMinMaxDouble () {
+            return new MinMaxDouble((double)min, (double)max);
+        }
+
+        @Override
+        public List<Attribute> getAttributes() {
+            return Utils.createList(
+                    new Attribute(new AttributeType(Type.MainAttribute), "min", min),
+                    new Attribute(new AttributeType(Type.MainAttribute), "max", max));
+        }
+
+    }
+
+    /**
+     * a representation for a double minimum and a double maximum value
+     */
+    public static class MinMaxDouble extends GenObject {
+
+        /**
+         * the minimum and maximum values
+         */
+        protected final double min, max;
+
+        /**
+         * the constructor
+         *
+         * @param _min the minimum
+         * @param _max the maximum
+         * @throws IllegalArgumentException if max is smaller than min
+         */
+        public MinMaxDouble (double _min, double _max) {
+            if (_max < _min)
+                throw new IllegalArgumentException("max has to be >= min.");
+
+            min = _min;
+            max = _max;
+        }
+
+        /**
+         * return the minimum
+         *
+         * @return the minimum
+         */
+        public double getMin () {
+            return min;
+        }
+
+        /**
+         * return the maximum
+         *
+         * @return the maximum
+         */
+        public double getMax () {
+            return max;
+        }
+
+        /**
+         * is the given value in the bounds?
+         *
+         * @param value the input value
+         * @return true, if it is in bounds
+         */
+        public boolean inBounds(double value) {
+            return (value >= min && value <= max);
+        }
+
+        /**
+         * apply the bounds to the given value
+         *
+         * @param value the input value
+         * @return the value, in bounds
+         */
+        public double applyBounds(double value) {
+            if (value < min)
+                return min;
+            if (value > max)
+                return max;
+            return value;
+        }
+
+        /**
+         * converts this MinMaxDouble to a MinMaxLong
+         *
+         * @return the requested MinMaxLong
+         */
+        public MinMaxLong toMinMaxLong () {
+            return new MinMaxLong((long)Math.floor(min), Math.round(max));
+        }
+
+        @Override
+        public List<Attribute> getAttributes() {
+            return Utils.createList(
+                    new Attribute(new AttributeType(Type.MainAttribute), "min", min),
+                    new Attribute(new AttributeType(Type.MainAttribute), "max", max));
+        }
 
     }
 

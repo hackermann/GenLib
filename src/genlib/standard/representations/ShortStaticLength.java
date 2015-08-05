@@ -94,7 +94,12 @@ public class ShortStaticLength extends AnyLongStaticLength {
             randomArray[i] = distribution.getRandomShort(step.getRandom());
         return new ShortStaticLengthInstance(this, randomArray);
     }
-    
+
+    @Override
+    public long applyBounds(long value) {
+        return distribution.getMinMaxLong().applyBounds(value);
+    }
+
     @Override
     public List<Attribute> getAttributes() {
         return Utils.extendList( super.getAttributes(), new Attribute(new AttributeType(AttributeType.Type.MainAttribute), "distribution", distribution) );

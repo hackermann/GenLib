@@ -27,6 +27,7 @@ package genlib.standard.representations;
 import genlib.abstractrepresentation.AlgorithmStep;
 import genlib.abstractrepresentation.GenInstance;
 import genlib.extended.distributions.BasicTypeDistributions.ByteDistribution;
+import genlib.extended.distributions.BasicTypeDistributions.MinMaxLong;
 import genlib.extended.distributions.LinearDistribution;
 import genlib.standard.representations.AnyTypeStaticLength.AnyLongStaticLength;
 import genlib.standard.representations.AnyTypeStaticLength.AnyTypeStaticLengthInstance.AnyLongStaticLengthInstance;
@@ -94,7 +95,12 @@ public class ByteStaticLength extends AnyLongStaticLength {
             randomArray[i] = distribution.getRandomByte(step.getRandom());
         return new ByteStaticLengthInstance(this, randomArray);
     }
-    
+
+    @Override
+    public long applyBounds(long value) {
+        return distribution.getMinMaxLong().applyBounds(value);
+    }
+
     @Override
     public List<Attribute> getAttributes() {
         return Utils.extendList( super.getAttributes(), new Attribute(new AttributeType(AttributeType.Type.MainAttribute), "distribution", distribution) );

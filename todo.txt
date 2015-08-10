@@ -7,10 +7,10 @@ Currently in work
 TODO
 =========
 
-inherit GenRepresentation and the corresponding operators
-hierarchical GenRepresentation (AND / OR) and the corresponding operatos
 Graph export in R
 example-implementations: sales-travelling-problem (mutation: swap 2 entries / revert 1 chain of values - recombination prefix of indiv. 1 and order of the rest / look at adjacence-lists, start with random and look for adjacences with less possibilities)
+algorithm split in Algorithm-template (with null-operators / representations / ..) & Algorithm-... with all set & Running-Algorithm, which replaces AlgorithmStep 
+a mutation-operators, that just uses instantiaterandom
 gray-enccoding (XOR)
 extend existing operators at existing representations
 gauss-mutation (one value mutates with gauss-distribution)
@@ -35,6 +35,13 @@ relative expected improvement of mutation / recombination-operator (can be done 
 imagine operator (recombination /mutation) with a step-size: (a) constant step-size (b) step-size will be lowered with constant factor (c) adaptive: count of better solutions after operator vs count of worse solutions after operator (in last generation) > constant value => higher the step-size otherwise lower the step size (d) self-adaptive: additional information of stepsize in individdum, that will go through evolution too (as example with gauss-change)
 
 
+============
+Reserved for later
+============
+
+inherit GenRepresentation and the corresponding operators (actual a standard-operation (AND(Genrep1, Genrep2, ..)), the mutation / recombination should maybe be gauss or have slower changes in later generations .. ?)
+
+
 
 ==========
 Done
@@ -42,3 +49,5 @@ Done
 
 diversity for population (avg distance between populations (calculated exactly and with random-examples) / shannon-entropy (page 62) / sub-string-entropy (page 63))
 uniform-crossover (every entry has 1/2 probability of left or right) / interpolational recombination (static random interpolation, random for every entry) / extrapolational recombination
+plots: functionality scaleY (min,max)
+hierarchical GenRepresentation (AND / OR) and the corresponding operatos

@@ -24,6 +24,7 @@
 
 package genlib.extended.diversity;
 
+import genlib.abstractrepresentation.AlgorithmStep;
 import genlib.abstractrepresentation.GenInstance;
 import genlib.abstractrepresentation.GenObject;
 import genlib.abstractrepresentation.GenObject.AttributeType.Type;
@@ -98,7 +99,7 @@ public class AverageDiversity extends AbstractDiversity {
     }
 
     @Override
-    protected double calculateDiversity(List<GenInstance> population) {
+    protected double calculateDiversity(List<GenInstance> population, AlgorithmStep step) {
         if (population.size() <= 1)
             return 0;
 
@@ -111,7 +112,7 @@ public class AverageDiversity extends AbstractDiversity {
     }
 
     @Override
-    public boolean isCompatibleWith(GenRepresentation representation) {
+    public boolean isCompatible(GenRepresentation representation) {
         return (distanceOp.isCompatibleWith(representation));
     }
 
@@ -153,7 +154,8 @@ public class AverageDiversity extends AbstractDiversity {
         }
 
         /**
-         * a standard-implementation for the individuum-distance-operator
+         * a standard-implementation for the individuum-distance-operator.
+         * The distance is the average of each distance between two entries.
          */
         public static class StandardDistanceOp extends IndividuumDistanceOp {
 

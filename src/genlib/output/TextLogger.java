@@ -24,6 +24,8 @@
 
 package genlib.output;
 
+import genlib.abstractrepresentation.AlgorithmPass;
+import genlib.abstractrepresentation.AlgorithmStep;
 import genlib.abstractrepresentation.GenObject;
 import genlib.abstractrepresentation.GeneticAlgorithm;
 import genlib.abstractrepresentation.GeneticAlgorithm.Individuum;
@@ -111,12 +113,12 @@ public class TextLogger extends Logger {
         populationLogging = _populationLogging;
         timeLogging = _timeLogging;
     }
-    
-    @Override
-    public void compatibilityCheck(GeneticAlgorithm algorithm) { }
 
     @Override
-    protected void log (LogType logType, GeneticAlgorithm algorithm) {
+    public void compatibilityCheck(GeneticAlgorithm algorithm, AlgorithmPass pass) { }
+
+    @Override
+    protected void log (LogType logType, GeneticAlgorithm algorithm, AlgorithmStep step) {
         switch (logType) {
             case StartAlgorithm:
                 addLogEntry("Started algorithm '" + algorithm.getName() + "': " + algorithm);

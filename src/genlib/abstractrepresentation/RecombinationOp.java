@@ -30,7 +30,7 @@ package genlib.abstractrepresentation;
  *
  * @author Hilmar
  */
-public interface RecombinationOp {
+public interface RecombinationOp extends Operator {
 
     /**
      * the actual operator.
@@ -61,21 +61,5 @@ public interface RecombinationOp {
      * @return true, if compatible
      */
     public boolean isOutputSizeCompatible (int size);
-
-    /**
-     * is this operator compatible with this type of a genoType?
-     *
-     * @param representation the type of the genoType
-     * @return true, if compatible
-     */
-    public boolean isCompatible(GenRepresentation representation);
-
-    /**
-     * is this operator compatible with this AlgorithmPass?
-     *
-     * @param algorithmPass the algorithmPass
-     * @return true, if compatible
-     */
-    public boolean isCompatible(AlgorithmPass algorithmPass);
 
 }

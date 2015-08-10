@@ -24,6 +24,8 @@
 
 package genlib.output;
 
+import genlib.abstractrepresentation.AlgorithmPass;
+import genlib.abstractrepresentation.AlgorithmStep;
 import genlib.abstractrepresentation.GenObject;
 import genlib.abstractrepresentation.GenObject.Attribute;
 import genlib.abstractrepresentation.GenObject.AttributeType.Type;
@@ -59,23 +61,25 @@ public abstract class Logger extends GenObject {
      * this method will be invoked by the algorithm, if it is started
      *
      * @param algorithm the invoking algorithm
+     * @param step the algorithm-step
      */
-    public void startAlgorithm(GeneticAlgorithm algorithm) {
+    public void startAlgorithm(GeneticAlgorithm algorithm, AlgorithmStep step) {
         //the first invoke of this method? => logging will reset
         if (startedAlgorithms.isEmpty())
            starting();
         startedAlgorithms.add(algorithm);
 
-        log(LogType.StartAlgorithm, algorithm);
+        log(LogType.StartAlgorithm, algorithm, step);
     }
 
     /**
      * this method will be invoked by the algorithm, if it is completed
      *
      * @param algorithm the invoking algorithm
+     * @param step the algorithm-step
      */
-    public void endAlgorithm(GeneticAlgorithm algorithm) {
-        log(LogType.EndAlgorithm, algorithm);
+    public void endAlgorithm(GeneticAlgorithm algorithm, AlgorithmStep step) {
+        log(LogType.EndAlgorithm, algorithm, step);
 
         startedAlgorithms.remove(algorithm);
         //the first added algorithm is ready? => logging is completed
@@ -87,26 +91,29 @@ public abstract class Logger extends GenObject {
      * this method will be invoked by the algorithm, if a new generation starts
      *
      * @param algorithm the invoking algorithm
+     * @param step the algorithm-step
      */
-    public void logGeneration(GeneticAlgorithm algorithm) {
-        log(LogType.Generation, algorithm);
+    public void logGeneration(GeneticAlgorithm algorithm, AlgorithmStep step) {
+        log(LogType.Generation, algorithm, step);
     }
-    
+
     /**
      * this method does a compatibility check with the geneticAlgorithm.
      * The operators and representations of the algorithm should be set.
-     * 
+     *
      * @param algorithm the algorithm
+     * @param pass the algorithm-pass this algorithm is executed with
      */
-    public abstract void compatibilityCheck(GeneticAlgorithm algorithm);
+    public abstract void compatibilityCheck(GeneticAlgorithm algorithm, AlgorithmPass pass);
 
     /**
      * this method processes in the subclass the actual logging
      *
      * @param logType what is logged?
      * @param algorithm the invoking algorithm
+     * @param step the algorithm-step
      */
-    protected abstract void log (LogType logType, GeneticAlgorithm algorithm);
+    protected abstract void log (LogType logType, GeneticAlgorithm algorithm, AlgorithmStep step);
 
     /**
      * this is a reset of the logging

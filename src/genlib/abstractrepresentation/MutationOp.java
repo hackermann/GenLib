@@ -29,7 +29,7 @@ package genlib.abstractrepresentation;
  *
  * @author Hilmar
  */
-public interface MutationOp {
+public interface MutationOp extends Operator {
 
     /**
      * the actual operator
@@ -39,21 +39,5 @@ public interface MutationOp {
      * @return the mutated input
      */
     public GenInstance mutationOp (GenInstance input, AlgorithmStep step);
-
-    /**
-     * is this operator compatible with this type of a genoType?
-     *
-     * @param representation the type of the genoType
-     * @return true, if compatible
-     */
-    public boolean isCompatible(GenRepresentation representation);
-
-    /**
-     * is this operator compatible with this AlgorithmPass?
-     *
-     * @param algorithmPass the algorithmPass
-     * @return true, if compatible
-     */
-    public boolean isCompatible(AlgorithmPass algorithmPass);
 
 }

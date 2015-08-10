@@ -29,7 +29,7 @@ package genlib.abstractrepresentation;
  *
  * @author Hilmar
  */
-public interface GenoToPhenoOp {
+public interface GenoToPhenoOp extends Operator {
 
     /**
      * the actual operator.
@@ -41,27 +41,12 @@ public interface GenoToPhenoOp {
     public GenInstance genoToPhenoOp (GenInstance input, AlgorithmStep step);
 
     /**
-     * is this operator compatible with this type of a genoType?
+     * is this operator compatible with this type of a genoType and phenoType?
      *
-     * @param representation the type of the genoType
+     * @param genoType the type of the genoType
+     * @param phenoType the type of the phenoType
      * @return true, if compatible
      */
-    public boolean isCompatibleGenoType(GenRepresentation representation);
-
-    /**
-     * is this operator compatible with this type of a phenoType?
-     *
-     * @param representation the type of the phenoType
-     * @return true, if compatible
-     */
-    public boolean isCompatiblePhenoType(GenRepresentation representation);
-
-    /**
-     * is this operator compatible with this AlgorithmPass?
-     *
-     * @param algorithmPass the algorithmPass
-     * @return true, if compatible
-     */
-    public boolean isCompatible(AlgorithmPass algorithmPass);
+    public boolean isGenoPhenoCompatible(GenRepresentation genoType, GenRepresentation phenoType);
 
 }

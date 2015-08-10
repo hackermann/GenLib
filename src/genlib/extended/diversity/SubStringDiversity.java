@@ -24,6 +24,7 @@
 
 package genlib.extended.diversity;
 
+import genlib.abstractrepresentation.AlgorithmStep;
 import genlib.abstractrepresentation.GenInstance;
 import genlib.abstractrepresentation.GenRepresentation;
 import genlib.standard.representations.AnyTypeStaticLength;
@@ -82,7 +83,7 @@ public class SubStringDiversity extends AbstractDiversity {
     }
 
     @Override
-    protected double calculateDiversity(List<GenInstance> population) {
+    protected double calculateDiversity(List<GenInstance> population, AlgorithmStep step) {
         Set <DoubleStaticLengthInstance> allSubStrings = new HashSet();
         long sum = 0;
         for (GenInstance instance : population) {
@@ -94,7 +95,7 @@ public class SubStringDiversity extends AbstractDiversity {
     }
 
     @Override
-    public boolean isCompatibleWith(GenRepresentation representation) {
+    public boolean isCompatible(GenRepresentation representation) {
         return representation instanceof AnyTypeStaticLength;
     }
 

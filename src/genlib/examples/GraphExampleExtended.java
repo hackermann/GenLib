@@ -77,6 +77,7 @@ public class GraphExampleExtended {
                 milliSecondsToGeneration25.getSuggestedName(),
                 milliSecondsToGeneration25.getSuggestedXAxisName(),
                 milliSecondsToGeneration25.getSuggestedYAxisName(),
+                null,
                 0.0,        //the standard-value, if one discretized group has no entry: this can't happen in our case, because we have just one plot
                 true,       //x-axis will get ints: the double values will be round
                 false,      //y-axis should be still doubles

@@ -24,6 +24,8 @@
 
 package genlib.output;
 
+import genlib.abstractrepresentation.AlgorithmPass;
+import genlib.abstractrepresentation.AlgorithmStep;
 import genlib.abstractrepresentation.GenInstance;
 import genlib.abstractrepresentation.GenObject;
 import genlib.abstractrepresentation.GenObject.AttributeType.Type;
@@ -69,12 +71,6 @@ public class Graph2DLogger extends Logger {
      * the values of the y-axis, in the order they arrived
      */
     protected List <Number> yValues = new ArrayList();
-    
-    /**
-     * this random-object will be resetted with every starting(), because
-     * we want to have deterministic logging results
-     */
-    protected Random staticRandom;
 
     /**
      * the constructor
@@ -307,19 +303,19 @@ public class Graph2DLogger extends Logger {
             yValues.add(y);
         }
     }
-    
+
     @Override
-    public void compatibilityCheck(GeneticAlgorithm algorithm) {
-        xAxis.compatibilityCheck(algorithm);
-        yAxis.compatibilityCheck(algorithm);
+    public void compatibilityCheck(GeneticAlgorithm algorithm, AlgorithmPass pass) {
+        xAxis.compatibilityCheck(algorithm, pass);
+        yAxis.compatibilityCheck(algorithm, pass);
     }
 
     @Override
-    protected void log(LogType logType, GeneticAlgorithm algorithm) {
+    protected void log(LogType logType, GeneticAlgorithm algorithm, AlgorithmStep step) {
         if (logType == LogType.Generation) {
             //first calculate the specified value for the x-axis, then for the y-axis
-            Number xValue = calculate(xAxis, algorithm);
-            Number yValue = calculate(yAxis, algorithm);
+            Number xValue = calculate(xAxis, algorithm, step);
+            Number yValue = calculate(yAxis, algorithm, step);
 
             //if one of the values if null, this point will not be saved
             addPoint(xValue, yValue);
@@ -331,7 +327,6 @@ public class Graph2DLogger extends Logger {
         startMicroTime = System.nanoTime()/1000;
         xValues = new ArrayList();
         yValues = new ArrayList();
-        staticRandom = new Random(123456789);
     }
 
     @Override
@@ -343,9 +338,10 @@ public class Graph2DLogger extends Logger {
      *
      * @param axisType the requested value
      * @param algorithm the algorithm currently running
+     * @param step the algorithm-step
      * @return the calculated value or null
      */
-    protected Number calculate (AxisType axisType, GeneticAlgorithm algorithm) {
+    protected Number calculate (AxisType axisType, GeneticAlgorithm algorithm, AlgorithmStep step) {
         switch (axisType.basicType) {
 
             case Time:
@@ -387,15 +383,15 @@ public class Graph2DLogger extends Logger {
 
             case JustName:
                 return null;
-                
+
             case DiversityGenoType:
             case DiversityPhenoType:
-                List <GenInstance> genInstances = new ArrayList(); 
+                List <GenInstance> genInstances = new ArrayList();
                 for (Individuum individuum : algorithm.getCurrentPopulation())
                     genInstances.add( (axisType.basicType == BasicType.DiversityGenoType ? individuum.getGenoType() : individuum.getPhenoType() ) );
-                
+
                 //we need a static random-type here, because we want to have a deterministic
-                return axisType.diversity.getDiversity(genInstances, staticRandom);
+                return axisType.diversity.diversityOp(genInstances, step);
 
             default:
                 throw new AssertionError(axisType.basicType.name());
@@ -408,14 +404,13 @@ public class Graph2DLogger extends Logger {
                                                         new Attribute(new AttributeType(Type.MainAttribute), "yAxis", yAxis),
                                                         new Attribute(new AttributeType(Type.TemporaryOrUnimportant), "startMicroTime", startMicroTime),
                                                         new Attribute(new AttributeType(Type.TemporaryOrUnimportant), "xValues", xValues),
-                                                        new Attribute(new AttributeType(Type.TemporaryOrUnimportant), "yValues", yValues),
-                                                        new Attribute(new AttributeType(Type.TemporaryOrUnimportant), "staticRandom", staticRandom));
+                                                        new Attribute(new AttributeType(Type.TemporaryOrUnimportant), "yValues", yValues));
     }
 
     /**
      * This class defines the type of the requested value for one axis
      */
-    public static class AxisType extends GenObject {       
+    public static class AxisType extends GenObject {
 
         /**
          * The basic-type: Measure the Time, Generation (or just every k'th generation), the average fitness
@@ -452,7 +447,7 @@ public class Graph2DLogger extends Logger {
          * if it is not null, this will be the suggested name
          */
         protected final String individualName;
-        
+
         /**
          * just needed if basicType is DiversityGenoType or DiversityPhenoType
          */
@@ -514,10 +509,10 @@ public class Graph2DLogger extends Logger {
 
                 case JustName:
                     return individualName;
-                    
+
                 case DiversityGenoType:
                     return "diversity of the genoType ('" + diversity.getName() + "')";
-                            
+
                 case DiversityPhenoType:
                     return "diversity of the phenoType ('" + diversity.getName() + "')";
 
@@ -525,18 +520,23 @@ public class Graph2DLogger extends Logger {
                     throw new AssertionError(basicType.name());
             }
         }
-        
+
         /**
          * do a compatibility check with the given algorithm
-         * 
+         *
          * @param algorithm the algorithm
+         * @param pass the algorithm-pass this algorithm is executed with
+         * @throws GeneticRuntimeException if not compatible
          */
-        public void compatibilityCheck(GeneticAlgorithm algorithm) {
+        public void compatibilityCheck(GeneticAlgorithm algorithm, AlgorithmPass pass) {
+            if (diversity != null && !diversity.isCompatible(pass))
+                throw new GeneticRuntimeException("the chosen algorithm-pass is not compatible with the diversity.");
+
             if (    basicType == BasicType.DiversityGenoType &&
-                    (algorithm.getGenoType() == null || !diversity.isCompatibleWith(algorithm.getGenoType())))
+                    (algorithm.getGenoType() == null || !diversity.isCompatible(algorithm.getGenoType())))
                 throw new GeneticRuntimeException("the chosen genoType is not compatible with the diversity logging in one axis.");
             if (    basicType == BasicType.DiversityPhenoType &&
-                    (algorithm.getPhenoType() == null || !diversity.isCompatibleWith(algorithm.getPhenoType())))
+                    (algorithm.getPhenoType() == null || !diversity.isCompatible(algorithm.getPhenoType())))
                 throw new GeneticRuntimeException("the chosen phenoType is not compatible with the diversity logging in one axis.");
         }
 
@@ -678,7 +678,7 @@ public class Graph2DLogger extends Logger {
 
             return new AxisType(BasicType.JustName, Double.NaN, -1, -1, name, null);
         }
-        
+
         /**
          * the creation-method for an axis, that will measure a diversity
          * of the genoType
@@ -693,7 +693,7 @@ public class Graph2DLogger extends Logger {
 
             return new AxisType(BasicType.DiversityGenoType, Double.NaN, -1, -1, null, _diversity);
         }
-        
+
         /**
          * the creation-method for an axis, that will measure a diversity
          * of the phenoType

@@ -50,13 +50,13 @@ public class UniformCrossover extends GenObject implements RecombinationOp {
         if (representation.isLongType()) {
             long [] outputValues = new long [representation.getLength()];
             for (int i=0; i<outputValues.length; i++)
-                outputValues[i] = ((AnyTypeStaticLengthInstance)input[step.getRandom().nextInt(representation.getLength())]).getLongValue(i);
+                outputValues[i] = ((AnyTypeStaticLengthInstance)input[step.getRandom().nextInt(input.length)]).getLongValue(i);
             return new GenInstance[] {representation.instantiateFromLongs(outputValues)};
-            
+
         } else {
             double [] outputValues = new double [representation.getLength()];
             for (int i=0; i<outputValues.length; i++)
-                outputValues[i] = ((AnyTypeStaticLengthInstance)input[step.getRandom().nextInt(representation.getLength())]).getDoubleValue(i);
+                outputValues[i] = ((AnyTypeStaticLengthInstance)input[step.getRandom().nextInt(input.length)]).getDoubleValue(i);
             return new GenInstance[] {representation.instantiateFromDoubles(outputValues)};
         }
     }

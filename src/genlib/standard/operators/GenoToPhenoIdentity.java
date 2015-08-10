@@ -46,12 +46,12 @@ public class GenoToPhenoIdentity extends GenObject implements GenoToPhenoOp {
     }
 
     @Override
-    public boolean isCompatibleGenoType(GenRepresentation representation) {
-        return true;
+    public boolean isGenoPhenoCompatible(GenRepresentation genoType, GenRepresentation phenoType) {
+        return genoType.equals(phenoType);
     }
 
     @Override
-    public boolean isCompatiblePhenoType(GenRepresentation representation) {
+    public boolean isCompatible(GenRepresentation representation) {
         return true;
     }
 

@@ -24,6 +24,7 @@
 
 package genlib.extended.diversity;
 
+import genlib.abstractrepresentation.AlgorithmStep;
 import genlib.abstractrepresentation.GenInstance;
 import genlib.abstractrepresentation.GenRepresentation;
 import genlib.standard.representations.AnyTypeStaticLength;
@@ -59,7 +60,7 @@ public class ShannonEntropyDiversity extends AbstractDiversity {
     }
 
     @Override
-    protected double calculateDiversity(List<GenInstance> population) {
+    protected double calculateDiversity(List<GenInstance> population, AlgorithmStep step) {
 
         //the length of our static instances
         int staticLength = ((AnyTypeStaticLength)((AnyTypeStaticLengthInstance)population.get(0)).getRepresentation()).getLength();
@@ -82,7 +83,7 @@ public class ShannonEntropyDiversity extends AbstractDiversity {
     }
 
     @Override
-    public boolean isCompatibleWith(GenRepresentation representation) {
+    public boolean isCompatible(GenRepresentation representation) {
         return representation instanceof AnyTypeStaticLength;
     }
 

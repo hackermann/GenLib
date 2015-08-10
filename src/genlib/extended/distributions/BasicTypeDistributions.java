@@ -271,6 +271,15 @@ public class BasicTypeDistributions {
         }
 
         /**
+         * returns the distance between min and max
+         *
+         * @return the distance
+         */
+        public long getDistance () {
+            return max-min;
+        }
+
+        /**
          * converts this MinMaxLong to a MinMaxDouble
          *
          * @return the requested MinMaxDouble
@@ -353,6 +362,15 @@ public class BasicTypeDistributions {
             if (value > max)
                 return max;
             return value;
+        }
+
+        /**
+         * returns the distance between min and max
+         *
+         * @return the distance
+         */
+        public double getDistance () {
+            return max-min;
         }
 
         /**

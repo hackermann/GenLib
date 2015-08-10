@@ -128,7 +128,7 @@ public class FloatStaticLength extends AnyDoubleStaticLength {
         public FloatStaticLengthInstance(FloatStaticLength _parent, float ... _array) {
             super(_parent);
 
-            if (_array.length != _parent.getLength())
+            if (_array == null || _array.length != _parent.getLength())
                 throw new IllegalArgumentException("length of array not as expected, is: " + _array.length + ", expected: " + _parent.getLength());
 
             array = new float[_array.length];

@@ -78,6 +78,7 @@ public abstract class AbstractDistribution extends GenObject implements LongDist
                 "distribution of '" + measureQuantity + "' random-values",
                 "random-value",
                 "count",
+                null,
                 0.0,            //the standard-value, if one discretized group has no entry: this can't happen in our case, because we have just one plot
                 (numberType != NumberType.Double && numberType != NumberType.Float),        //x-axis will get ints, if we have no doubles or floats
                 true,           //y-axis will get ints

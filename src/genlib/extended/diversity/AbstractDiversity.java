@@ -24,10 +24,13 @@
 
 package genlib.extended.diversity;
 
+import genlib.abstractrepresentation.AlgorithmPass;
+import genlib.abstractrepresentation.AlgorithmStep;
 import genlib.abstractrepresentation.GenInstance;
 import genlib.abstractrepresentation.GenObject;
 import genlib.abstractrepresentation.GenObject.AttributeType.Type;
 import genlib.abstractrepresentation.GenRepresentation;
+import genlib.abstractrepresentation.Operator;
 import genlib.utils.Utils;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +41,7 @@ import java.util.Random;
  *
  * @author Hilmar
  */
-public abstract class AbstractDiversity extends GenObject {
+public abstract class AbstractDiversity extends GenObject implements Operator {
 
     /**
      * the percent of the population, we do the diversity-measuring with.
@@ -70,18 +73,18 @@ public abstract class AbstractDiversity extends GenObject {
      * returns the diversity of a population
      *
      * @param population the population
-     * @param random a random-object
+     * @param step the algorithm-step
      * @return the calulated diversity
      */
-    public double getDiversity (List <GenInstance> population, Random random) {
+    public double diversityOp (List <GenInstance> population, AlgorithmStep step) {
 
         List <GenInstance> copiedPopulation = new ArrayList();
         copiedPopulation.addAll(population);
 
         while (copiedPopulation.size() > 0 && copiedPopulation.size() > percentPopulation*population.size())
-            copiedPopulation.remove(random.nextInt(copiedPopulation.size()));
+            copiedPopulation.remove(step.getRandom().nextInt(copiedPopulation.size()));
 
-        return calculateDiversity(copiedPopulation);
+        return calculateDiversity(copiedPopulation, step);
     }
 
     /**
@@ -89,17 +92,16 @@ public abstract class AbstractDiversity extends GenObject {
      * but just a subset of the whole population
      *
      * @param population the population or a subset of it
+     * @param step the algorithm-step
      * @return the calculated value
      */
-    protected abstract double calculateDiversity (List <GenInstance> population);
+    protected abstract double calculateDiversity (List <GenInstance> population, AlgorithmStep step);
 
-    /**
-     * Is this diversity-operator compatible with the given GenRepresentation?
-     *
-     * @param representation the GenRepresentation
-     * @return true, if compatible
-     */
-    public abstract boolean isCompatibleWith (GenRepresentation representation);
+    @Override
+    public boolean isCompatible (AlgorithmPass algorithmPass) {
+        //this check is not done actually, it is
+        return true;
+    }
 
     /**
      * get the name of this type of diversity

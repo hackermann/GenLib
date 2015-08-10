@@ -24,12 +24,13 @@
 
 package genlib.examples;
 
+import genlib.extended.distributions.AbstractDistribution;
+import genlib.extended.distributions.BasicTypeDistributions.MinMaxDouble;
+import genlib.extended.distributions.GaussianDistribution;
+import genlib.extended.distributions.LinearDistribution;
 import genlib.output.gui.Graph2D;
 import genlib.output.gui.Graph2D.Plot2DContinuousX;
 import genlib.output.gui.Graph2D.PlotCollection;
-import genlib.extended.distributions.AbstractDistribution;
-import genlib.extended.distributions.GaussianDistribution;
-import genlib.extended.distributions.LinearDistribution;
 
 /**
  * An extended example, that demonstrates the distributions.
@@ -66,8 +67,9 @@ public class DistributionExampleExtended {
                 "different distribution-examples",
                 "random-value",
                 "count",
-                true,           //x-axis will get ints
-                true,           //y-axis will get ints
+                new MinMaxDouble(0,1),  //normalize plots to [0,1]
+                true,                   //x-axis will get ints
+                false,                  //y-axis will get ints
                 plot1,
                 plot2,
                 plot3);

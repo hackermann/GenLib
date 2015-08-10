@@ -37,11 +37,14 @@ import genlib.examples.DiversityExample;
 import genlib.examples.ExampleViewer;
 import genlib.examples.GraphExampleExtended;
 import genlib.examples.GraphExampleMinimal;
+import genlib.examples.HierarchicalExample;
 import genlib.examples.StandardExampleMinimal;
 import genlib.extended.distributions.BasicTypeDistributions;
 import genlib.extended.distributions.BasicTypeDistributions.MinMaxDouble;
 import genlib.extended.distributions.BasicTypeDistributions.MinMaxLong;
 import genlib.extended.distributions.LinearDistribution;
+import genlib.extended.diversity.AverageDiversity;
+import genlib.extended.diversity.HierarchicalDiversity;
 import genlib.output.Graph2DLogger;
 import genlib.output.Graph2DLogger.AxisType;
 import genlib.output.TextLogger.PopulationLogging;
@@ -55,7 +58,13 @@ import genlib.standard.algorithms.StaticGeneticAlgorithm;
 import genlib.standard.operators.ArithmeticRecombination;
 import genlib.standard.operators.AverageFitness;
 import genlib.standard.operators.GenoToPhenoIdentity;
+import genlib.standard.operators.HierarchicalOp.HierarchicalAverageFitness;
+import genlib.standard.operators.HierarchicalOp.HierarchicalGenoToPhenoOp;
+import genlib.standard.operators.HierarchicalOp.HierarchicalRandomMutationOp;
+import genlib.standard.operators.HierarchicalOp.HierarchicalRecombinationOp;
+import genlib.standard.operators.HierarchicalOp.ReductionType;
 import genlib.standard.operators.KPointCrossover;
+import genlib.standard.operators.OnePointMutation;
 import genlib.standard.representations.BooleanStaticLength;
 import genlib.standard.representations.BooleanStaticLength.BooleanStaticLengthInstance;
 import genlib.standard.representations.ByteStaticLength;
@@ -66,6 +75,10 @@ import genlib.standard.representations.DoubleStaticLength;
 import genlib.standard.representations.DoubleStaticLength.DoubleStaticLengthInstance;
 import genlib.standard.representations.FloatStaticLength;
 import genlib.standard.representations.FloatStaticLength.FloatStaticLengthInstance;
+import genlib.standard.representations.Hierarchical.And;
+import genlib.standard.representations.Hierarchical.And.AndInstance;
+import genlib.standard.representations.Hierarchical.Or;
+import genlib.standard.representations.Hierarchical.Or.OrInstance;
 import genlib.standard.representations.IntStaticLength;
 import genlib.standard.representations.IntStaticLength.IntStaticLengthInstance;
 import genlib.standard.representations.LongStaticLength;
@@ -206,7 +219,7 @@ public class LibCompletenessTest {
             noStandardConstructors.put(KPointCrossover.class, new KPointCrossover(1));
             noStandardConstructors.put(AxisType.class, AxisType.averageFitness());
             noStandardConstructors.put(Attribute.class, new Attribute(new AttributeType(Type.MainAttribute), "attr", 0));
-            noStandardConstructors.put(PlotCollection.class, PlotCollection.createBarChart("title", "xAxis", "yAxis", 0, true, true, new Plot2DDiscreteX("title")));
+            noStandardConstructors.put(PlotCollection.class, PlotCollection.createBarChart("title", "xAxis", "yAxis", null, 0, true, true, new Plot2DDiscreteX("title")));
             GeneticAlgorithm gA = new StaticGeneticAlgorithm();
             gA.setGenoToPhenoOp(new GenoToPhenoIdentity());
             gA.setFitnessOp(new AverageFitness());
@@ -214,6 +227,16 @@ public class LibCompletenessTest {
             noStandardConstructors.put(MinMaxLong.class, new MinMaxLong(0,1));
             noStandardConstructors.put(MinMaxDouble.class, new MinMaxDouble(0,1));
             noStandardConstructors.put(ArithmeticRecombination.class, new ArithmeticRecombination(0.5));
+            noStandardConstructors.put(HierarchicalRecombinationOp.class, new HierarchicalRecombinationOp(new KPointCrossover(2)));
+            noStandardConstructors.put(HierarchicalGenoToPhenoOp.class, new HierarchicalGenoToPhenoOp(new GenoToPhenoIdentity()));
+            noStandardConstructors.put(HierarchicalRandomMutationOp.class, new HierarchicalRandomMutationOp(new OnePointMutation()));
+            noStandardConstructors.put(HierarchicalAverageFitness.class, new HierarchicalAverageFitness(ReductionType.average(), new AverageFitness()));
+            noStandardConstructors.put(ReductionType.class, ReductionType.average());
+            noStandardConstructors.put(And.class, new And(new BooleanStaticLength(5)));
+            noStandardConstructors.put(Or.class, new Or(new BooleanStaticLength(5)));
+            noStandardConstructors.put(AndInstance.class, new AndInstance(new And(new BooleanStaticLength(1)), new BooleanStaticLengthInstance(new BooleanStaticLength(1), true)));
+            noStandardConstructors.put(OrInstance.class, new OrInstance(new Or(new BooleanStaticLength(1)), new BooleanStaticLengthInstance(new BooleanStaticLength(1), true)));
+            noStandardConstructors.put(HierarchicalDiversity.class, new HierarchicalDiversity(ReductionType.average(), new AverageDiversity()));
 
             //All the special classes, who are no subclasses of GenObject
             Set <Class> ignoredClasses = new HashSet();
@@ -234,6 +257,7 @@ public class LibCompletenessTest {
             ignoredClasses.add(Main.class);
             ignoredClasses.add(CountingMap.class);
             ignoredClasses.add(DiversityExample.class);
+            ignoredClasses.add(HierarchicalExample.class);
 
             for (Class cl : allClasses) {
                 if (    ignoredClasses.contains(cl) ||                      //ignored class, because it is no subclass of GenObject on purpose

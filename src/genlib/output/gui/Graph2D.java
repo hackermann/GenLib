@@ -25,6 +25,8 @@
 package genlib.output.gui;
 
 import genlib.abstractrepresentation.GenObject;
+import genlib.extended.distributions.BasicTypeDistributions.MinMaxDouble;
+import genlib.extended.distributions.BasicTypeDistributions.MinMaxLong;
 import genlib.utils.Exceptions.GeneticRuntimeException;
 import genlib.utils.MergeOperator;
 import genlib.utils.Utils;
@@ -107,7 +109,7 @@ public class Graph2D extends ApplicationFrame {
      */
     public static Graph2D open (PlotCollection ... plotCollections) {
 
-        if (plotCollections.length == 0)
+        if (plotCollections == null || plotCollections.length == 0)
             throw new IllegalArgumentException("there have to be at least 1 plot-collection.");
 
         //calculate the count of rows and cols
@@ -146,7 +148,7 @@ public class Graph2D extends ApplicationFrame {
             throw new IllegalArgumentException("invalid gap: '" + gap + "'.");
         if (percentSizeOfScreen < 0.001 || percentSizeOfScreen > 1)
             throw new IllegalArgumentException("invalid percentSizeOfScreen: '" + percentSizeOfScreen + "'.");
-        if (plots.length != rows*cols)
+        if (plots == null || plots.length != rows*cols)
             throw new IllegalArgumentException("length of plots is not rows*cols.");
 
         //the window-title is a concatenation of all plots
@@ -243,6 +245,7 @@ public class Graph2D extends ApplicationFrame {
          * @param _xAxis description x-axis
          * @param _yAxis description y-axis
          * @param _valueForMissingData just needed for discrete chart: If the plots don't have the exact same discrete keys, we need a standard-value for this case
+         * @param scaleY scales all plots to this min and max value, can be null for no scaling
          * @param _xAxisDiscreteInts the x-axis can be converted to integer-values only
          * @param _yAxisDiscreteInts the y-axis can be converted to integer-values only
          * @param _plots2DDiscreteX all the discrete plots
@@ -250,7 +253,7 @@ public class Graph2D extends ApplicationFrame {
          * @throws IllegalArgumentException if we have 0 plots
          * @throws NullPointerException if title, x-axis-name or y-axis-name is null
          */
-        private PlotCollection (Type _type, String _title, String _xAxis, String _yAxis, double _valueForMissingData, boolean _xAxisDiscreteInts, boolean _yAxisDiscreteInts, Plot2DDiscreteX [] _plots2DDiscreteX, Plot2DContinuousX [] _plots2DContinuousX) {
+        private PlotCollection (Type _type, String _title, String _xAxis, String _yAxis, double _valueForMissingData, MinMaxDouble scaleY, boolean _xAxisDiscreteInts, boolean _yAxisDiscreteInts, Plot2DDiscreteX [] _plots2DDiscreteX, Plot2DContinuousX [] _plots2DContinuousX) {
             type = _type;
             title = _title;
             xAxis = _xAxis;
@@ -284,9 +287,11 @@ public class Graph2D extends ApplicationFrame {
                             }
 
                     titlesInUse.add(plots2DDiscreteX[i].getTitle());
+                    if (scaleY != null)
+                        plots2DDiscreteX[i].scaleYAxis(scaleY.getMin(), scaleY.getMax());
                     plots2DDiscreteX[i].finish();
                 }
-            } 
+            }
             if (plots2DContinuousX != null) {
                 if (plots2DContinuousX.length == 0)
                     throw new IllegalArgumentException("there has to be at least 1 plot.");
@@ -303,6 +308,8 @@ public class Graph2D extends ApplicationFrame {
                             }
 
                     titlesInUse.add(plots2DContinuousX[i].getTitle());
+                    if (scaleY != null)
+                        plots2DContinuousX[i].scaleYAxis(scaleY.getMin(), scaleY.getMax());
                     plots2DContinuousX[i].finish();
                 }
             }
@@ -320,7 +327,7 @@ public class Graph2D extends ApplicationFrame {
          * @throws NullPointerException if title, x-axis-name or y-axis-name is null
          */
         public static PlotCollection createContinuousLineChart (String title, String xAxis, String yAxis, Plot2DContinuousX ... plots) {
-            return new PlotCollection(Type.JustLines, title, xAxis, yAxis, -1.0, false, false, null, plots);
+            return new PlotCollection(Type.JustLines, title, xAxis, yAxis, -1.0, null, false, false, null, plots);
         }
 
         /**
@@ -335,7 +342,7 @@ public class Graph2D extends ApplicationFrame {
          * @throws NullPointerException if title, x-axis-name or y-axis-name is null
          */
         public static PlotCollection createContinuousPointsChart (String title, String xAxis, String yAxis, Plot2DContinuousX ... plots) {
-            return new PlotCollection(Type.JustPoints, title, xAxis, yAxis, -1.0, false, false, null, plots);
+            return new PlotCollection(Type.JustPoints, title, xAxis, yAxis, -1.0, null, false, false, null, plots);
         }
 
         /**
@@ -350,7 +357,7 @@ public class Graph2D extends ApplicationFrame {
          * @throws NullPointerException if title, x-axis-name or y-axis-name is null
          */
         public static PlotCollection createContinuousLineAndPointsChart (String title, String xAxis, String yAxis, Plot2DContinuousX ... plots) {
-            return new PlotCollection(Type.LineAndPoints, title, xAxis, yAxis, -1.0, false, false, null, plots);
+            return new PlotCollection(Type.LineAndPoints, title, xAxis, yAxis, -1.0, null, false, false, null, plots);
         }
 
         /**
@@ -365,7 +372,7 @@ public class Graph2D extends ApplicationFrame {
          * @throws NullPointerException if title, x-axis-name or y-axis-name is null
          */
         public static PlotCollection createDiscreteLineChart (String title, String xAxis, String yAxis, Plot2DDiscreteX ... plots) {
-            return new PlotCollection(Type.JustLines, title, xAxis, yAxis, 0.0, false, false, plots, null);
+            return new PlotCollection(Type.JustLines, title, xAxis, yAxis, 0.0, null, false, false, plots, null);
         }
 
         /**
@@ -380,7 +387,7 @@ public class Graph2D extends ApplicationFrame {
          * @throws NullPointerException if title, x-axis-name or y-axis-name is null
          */
         public static PlotCollection createDiscretePointsChart (String title, String xAxis, String yAxis, Plot2DDiscreteX ... plots) {
-            return new PlotCollection(Type.JustPoints, title, xAxis, yAxis, 0.0, false, false, plots, null);
+            return new PlotCollection(Type.JustPoints, title, xAxis, yAxis, 0.0, null, false, false, plots, null);
         }
 
         /**
@@ -395,7 +402,7 @@ public class Graph2D extends ApplicationFrame {
          * @throws NullPointerException if title, x-axis-name or y-axis-name is null
          */
         public static PlotCollection createDiscreteLineAndPointsChart (String title, String xAxis, String yAxis, Plot2DDiscreteX ... plots) {
-            return new PlotCollection(Type.LineAndPoints, title, xAxis, yAxis, 0.0, false, false, plots, null);
+            return new PlotCollection(Type.LineAndPoints, title, xAxis, yAxis, 0.0, null, false, false, plots, null);
         }
 
         /**
@@ -410,7 +417,7 @@ public class Graph2D extends ApplicationFrame {
          * @throws NullPointerException if title, x-axis-name or y-axis-name is null
          */
         public static PlotCollection createBarChart (String title, String xAxis, String yAxis, Plot2DDiscreteX ... plots) {
-            return new PlotCollection(Type.BarCharts, title, xAxis, yAxis, 0.0, false, false, plots, null);
+            return new PlotCollection(Type.BarCharts, title, xAxis, yAxis, 0.0, null, false, false, plots, null);
         }
 
         /**
@@ -419,6 +426,7 @@ public class Graph2D extends ApplicationFrame {
          * @param title the title
          * @param xAxis description x-axis
          * @param yAxis description y-axis
+         * @param scaleY scales all plots to this min and max value, can be null for no scaling
          * @param xAxisDiscreteInts the x-axis can be converted to integer-values only
          * @param yAxisDiscreteInts the y-axis can be converted to integer-values only
          * @param plots the plots
@@ -426,8 +434,8 @@ public class Graph2D extends ApplicationFrame {
          * @throws IllegalArgumentException if we have 0 plots
          * @throws NullPointerException if title, x-axis-name or y-axis-name is null
          */
-        public static PlotCollection createContinuousLineChart (String title, String xAxis, String yAxis, boolean xAxisDiscreteInts, boolean yAxisDiscreteInts, Plot2DContinuousX ... plots) {
-            return new PlotCollection(Type.JustLines, title, xAxis, yAxis, -1.0, xAxisDiscreteInts, yAxisDiscreteInts, null, plots);
+        public static PlotCollection createContinuousLineChart (String title, String xAxis, String yAxis, MinMaxDouble scaleY, boolean xAxisDiscreteInts, boolean yAxisDiscreteInts, Plot2DContinuousX ... plots) {
+            return new PlotCollection(Type.JustLines, title, xAxis, yAxis, -1.0, scaleY, xAxisDiscreteInts, yAxisDiscreteInts, null, plots);
         }
 
         /**
@@ -436,6 +444,7 @@ public class Graph2D extends ApplicationFrame {
          * @param title the title
          * @param xAxis description x-axis
          * @param yAxis description y-axis
+         * @param scaleY scales all plots to this min and max value, can be null for no scaling
          * @param xAxisDiscreteInts the x-axis can be converted to integer-values only
          * @param yAxisDiscreteInts the y-axis can be converted to integer-values only
          * @param plots the plots
@@ -443,8 +452,8 @@ public class Graph2D extends ApplicationFrame {
          * @throws IllegalArgumentException if we have 0 plots
          * @throws NullPointerException if title, x-axis-name or y-axis-name is null
          */
-        public static PlotCollection createContinuousPointsChart (String title, String xAxis, String yAxis, boolean xAxisDiscreteInts, boolean yAxisDiscreteInts, Plot2DContinuousX ... plots) {
-            return new PlotCollection(Type.JustPoints, title, xAxis, yAxis, -1.0, xAxisDiscreteInts, yAxisDiscreteInts, null, plots);
+        public static PlotCollection createContinuousPointsChart (String title, String xAxis, String yAxis, MinMaxDouble scaleY, boolean xAxisDiscreteInts, boolean yAxisDiscreteInts, Plot2DContinuousX ... plots) {
+            return new PlotCollection(Type.JustPoints, title, xAxis, yAxis, -1.0, scaleY, xAxisDiscreteInts, yAxisDiscreteInts, null, plots);
         }
 
         /**
@@ -453,6 +462,7 @@ public class Graph2D extends ApplicationFrame {
          * @param title the title
          * @param xAxis description x-axis
          * @param yAxis description y-axis
+         * @param scaleY scales all plots to this min and max value, can be null for no scaling
          * @param xAxisDiscreteInts the x-axis can be converted to integer-values only
          * @param yAxisDiscreteInts the y-axis can be converted to integer-values only
          * @param plots the plots
@@ -460,8 +470,8 @@ public class Graph2D extends ApplicationFrame {
          * @throws IllegalArgumentException if we have 0 plots
          * @throws NullPointerException if title, x-axis-name or y-axis-name is null
          */
-        public static PlotCollection createContinuousLineAndPointsChart (String title, String xAxis, String yAxis, boolean xAxisDiscreteInts, boolean yAxisDiscreteInts, Plot2DContinuousX ... plots) {
-            return new PlotCollection(Type.LineAndPoints, title, xAxis, yAxis, -1.0, xAxisDiscreteInts, yAxisDiscreteInts, null, plots);
+        public static PlotCollection createContinuousLineAndPointsChart (String title, String xAxis, String yAxis, MinMaxDouble scaleY, boolean xAxisDiscreteInts, boolean yAxisDiscreteInts, Plot2DContinuousX ... plots) {
+            return new PlotCollection(Type.LineAndPoints, title, xAxis, yAxis, -1.0, scaleY, xAxisDiscreteInts, yAxisDiscreteInts, null, plots);
         }
 
         /**
@@ -470,6 +480,7 @@ public class Graph2D extends ApplicationFrame {
          * @param title the title
          * @param xAxis description x-axis
          * @param yAxis description y-axis
+         * @param scaleY scales all plots to this min and max value, can be null for no scaling
          * @param valueForMissingData If the plots don't have the exact same discrete keys, we need a standard-value for this case
          * @param xAxisDiscreteInts the x-axis can be converted to integer-values only
          * @param yAxisDiscreteInts the y-axis can be converted to integer-values only
@@ -478,8 +489,8 @@ public class Graph2D extends ApplicationFrame {
          * @throws IllegalArgumentException if we have 0 plots
          * @throws NullPointerException if title, x-axis-name or y-axis-name is null
          */
-        public static PlotCollection createDiscreteLineChart (String title, String xAxis, String yAxis, double valueForMissingData, boolean xAxisDiscreteInts, boolean yAxisDiscreteInts, Plot2DDiscreteX ... plots) {
-            return new PlotCollection(Type.JustLines, title, xAxis, yAxis, valueForMissingData, xAxisDiscreteInts, yAxisDiscreteInts, plots, null);
+        public static PlotCollection createDiscreteLineChart (String title, String xAxis, String yAxis, MinMaxDouble scaleY, double valueForMissingData, boolean xAxisDiscreteInts, boolean yAxisDiscreteInts, Plot2DDiscreteX ... plots) {
+            return new PlotCollection(Type.JustLines, title, xAxis, yAxis, valueForMissingData, scaleY, xAxisDiscreteInts, yAxisDiscreteInts, plots, null);
         }
 
         /**
@@ -488,6 +499,7 @@ public class Graph2D extends ApplicationFrame {
          * @param title the title
          * @param xAxis description x-axis
          * @param yAxis description y-axis
+         * @param scaleY scales all plots to this min and max value, can be null for no scaling
          * @param valueForMissingData If the plots don't have the exact same discrete keys, we need a standard-value for this case
          * @param xAxisDiscreteInts the x-axis can be converted to integer-values only
          * @param yAxisDiscreteInts the y-axis can be converted to integer-values only
@@ -496,8 +508,8 @@ public class Graph2D extends ApplicationFrame {
          * @throws IllegalArgumentException if we have 0 plots
          * @throws NullPointerException if title, x-axis-name or y-axis-name is null
          */
-        public static PlotCollection createDiscretePointsChart (String title, String xAxis, String yAxis, double valueForMissingData, boolean xAxisDiscreteInts, boolean yAxisDiscreteInts, Plot2DDiscreteX ... plots) {
-            return new PlotCollection(Type.JustPoints, title, xAxis, yAxis, valueForMissingData, xAxisDiscreteInts, yAxisDiscreteInts, plots, null);
+        public static PlotCollection createDiscretePointsChart (String title, String xAxis, String yAxis, MinMaxDouble scaleY, double valueForMissingData, boolean xAxisDiscreteInts, boolean yAxisDiscreteInts, Plot2DDiscreteX ... plots) {
+            return new PlotCollection(Type.JustPoints, title, xAxis, yAxis, valueForMissingData, scaleY, xAxisDiscreteInts, yAxisDiscreteInts, plots, null);
         }
 
         /**
@@ -506,6 +518,7 @@ public class Graph2D extends ApplicationFrame {
          * @param title the title
          * @param xAxis description x-axis
          * @param yAxis description y-axis
+         * @param scaleY scales all plots to this min and max value, can be null for no scaling
          * @param valueForMissingData If the plots don't have the exact same discrete keys, we need a standard-value for this case
          * @param xAxisDiscreteInts the x-axis can be converted to integer-values only
          * @param yAxisDiscreteInts the y-axis can be converted to integer-values only
@@ -514,8 +527,8 @@ public class Graph2D extends ApplicationFrame {
          * @throws IllegalArgumentException if we have 0 plots
          * @throws NullPointerException if title, x-axis-name or y-axis-name is null
          */
-        public static PlotCollection createDiscreteLineAndPointsChart (String title, String xAxis, String yAxis, double valueForMissingData, boolean xAxisDiscreteInts, boolean yAxisDiscreteInts, Plot2DDiscreteX ... plots) {
-            return new PlotCollection(Type.LineAndPoints, title, xAxis, yAxis, valueForMissingData, xAxisDiscreteInts, yAxisDiscreteInts, plots, null);
+        public static PlotCollection createDiscreteLineAndPointsChart (String title, String xAxis, String yAxis, MinMaxDouble scaleY, double valueForMissingData, boolean xAxisDiscreteInts, boolean yAxisDiscreteInts, Plot2DDiscreteX ... plots) {
+            return new PlotCollection(Type.LineAndPoints, title, xAxis, yAxis, valueForMissingData, scaleY, xAxisDiscreteInts, yAxisDiscreteInts, plots, null);
         }
 
         /**
@@ -524,6 +537,7 @@ public class Graph2D extends ApplicationFrame {
          * @param title the title
          * @param xAxis description x-axis
          * @param yAxis description y-axis
+         * @param scaleY scales all plots to this min and max value, can be null for no scaling
          * @param valueForMissingData If the plots don't have the exact same discrete keys, we need a standard-value for this case
          * @param xAxisDiscreteInts the x-axis can be converted to integer-values only
          * @param yAxisDiscreteInts the y-axis can be converted to integer-values only
@@ -532,8 +546,8 @@ public class Graph2D extends ApplicationFrame {
          * @throws IllegalArgumentException if we have 0 plots
          * @throws NullPointerException if title, x-axis-name or y-axis-name is null
          */
-        public static PlotCollection createBarChart (String title, String xAxis, String yAxis, double valueForMissingData, boolean xAxisDiscreteInts, boolean yAxisDiscreteInts, Plot2DDiscreteX ... plots) {
-            return new PlotCollection(Type.BarCharts, title, xAxis, yAxis, valueForMissingData, xAxisDiscreteInts, yAxisDiscreteInts, plots, null);
+        public static PlotCollection createBarChart (String title, String xAxis, String yAxis, MinMaxDouble scaleY, double valueForMissingData, boolean xAxisDiscreteInts, boolean yAxisDiscreteInts, Plot2DDiscreteX ... plots) {
+            return new PlotCollection(Type.BarCharts, title, xAxis, yAxis, valueForMissingData, scaleY, xAxisDiscreteInts, yAxisDiscreteInts, plots, null);
         }
 
         /**
@@ -742,6 +756,43 @@ public class Graph2D extends ApplicationFrame {
             return title;
         }
 
+        /**
+         * This method modifies the y-values of the points, so they
+         * will be in the range [0.0, 1.0]
+         *
+         * @throws GeneticRuntimeException if these plot is already in use
+         */
+        public void normalize() {
+            scaleYAxis(0, 1);
+        }
+
+        /**
+         * This method modifies the y-values of the points, so they
+         * will be in the range [min, max]
+         *
+         * @param min the smallest value on the y-axis
+         * @param max the largest value on the y-axis
+         * @throws GeneticRuntimeException if these plot is already in use
+         * @throws IllegalArgumentException if min or max are NaN or infinte or if max smaller than min
+         */
+        public abstract void scaleYAxis(double min, double max);
+
+        /**
+         * get the minimum and the maximum values on the x-axis.
+         * If there are points with a double-value, there index
+         * will count as x-value.
+         *
+         * @return the min-max-informations
+         */
+        public abstract MinMaxDouble getMinMaxXAxis();
+
+        /**
+         * get the minimum and the maximum values on the y-axis.
+         *
+         * @return the min-max-informations
+         */
+        public abstract MinMaxDouble getMinMaxYAxis();
+
         @Override
         public List <Attribute> getAttributes() {
             return Utils.createList( new Attribute(new AttributeType(AttributeType.Type.Descriptor), "title", title),
@@ -860,6 +911,63 @@ public class Graph2D extends ApplicationFrame {
         }
 
         @Override
+        public void scaleYAxis(double min, double max) {
+            if (inUse)
+                throw new GeneticRuntimeException("this plot is already in use - you can't modify points anymore.");
+            if (!Double.isFinite(min))
+                throw new IllegalArgumentException("min has to be finite (not NaN and not infinte)");
+            if (!Double.isFinite(max))
+                throw new IllegalArgumentException("max has to be finite (not NaN and not infinte)");
+            if (max < min)
+                throw new IllegalArgumentException("max has to be >= min");
+
+            MinMaxDouble minMaxY = getMinMaxYAxis();
+            for (int i=0; i<pts.size(); i++)
+                pts.set(i, new Pt(pts.get(i).x, ( (pts.get(i).y - minMaxY.getMin()) / minMaxY.getDistance()) * (max-min) + min) );
+        }
+
+        @Override
+        public MinMaxDouble getMinMaxXAxis() {
+            if (pts.isEmpty())
+                return new MinMaxDouble(0, 0);
+
+            double min = Double.POSITIVE_INFINITY, max = Double.NEGATIVE_INFINITY;
+            for (int i=0; i<pts.size(); i++) {
+                Pt pt = pts.get(i);
+                //if pt.x is a number, take the value as x-axis-value
+                if (pt.x instanceof Number) {
+                    if (((Number)pt.x).doubleValue() < min)
+                        min = ((Number)pt.x).doubleValue();
+                    if (((Number)pt.x).doubleValue() > max)
+                        max = ((Number)pt.x).doubleValue();
+
+                //if pt.x is NOT a number, take the index as x-axis-value
+                } else {
+                    if (i < min)
+                        min = i;
+                    if (i > max)
+                        max = i;
+                }
+            }
+            return new MinMaxDouble(min, max);
+        }
+
+        @Override
+        public MinMaxDouble getMinMaxYAxis() {
+            if (pts.isEmpty())
+                return new MinMaxDouble(0, 0);
+
+            double min = Double.POSITIVE_INFINITY, max = Double.NEGATIVE_INFINITY;
+            for (Pt pt : pts) {
+                if (pt.y < min)
+                    min = pt.y;
+                if (pt.y > max)
+                    max = pt.y;
+            }
+            return new MinMaxDouble(min, max);
+        }
+
+        @Override
         public List <Attribute> getAttributes() {
             return Utils.extendList(super.getAttributes(), new Attribute(new AttributeType(AttributeType.Type.MainAttribute), "pts", pts));
         }
@@ -920,7 +1028,7 @@ public class Graph2D extends ApplicationFrame {
         public Plot2DContinuousX (String _title, double ... pts) {
             super(_title);
 
-            if (pts.length%2 == 1)
+            if (pts == null || pts.length%2 == 1)
                 throw new IllegalArgumentException("invalid length of pts: has to be dividable by 2.");
 
             for (int i=0; i<pts.length; i+=2)
@@ -994,6 +1102,52 @@ public class Graph2D extends ApplicationFrame {
             for (Pt pt : pts)
                 series.add(pt.x, pt.y);
             return series;
+        }
+
+        @Override
+        public void scaleYAxis(double min, double max) {
+            if (inUse)
+                throw new GeneticRuntimeException("this plot is already in use - you can't modify points anymore.");
+            if (!Double.isFinite(min))
+                throw new IllegalArgumentException("min has to be finite (not NaN and not infinte)");
+            if (!Double.isFinite(max))
+                throw new IllegalArgumentException("max has to be finite (not NaN and not infinte)");
+            if (max < min)
+                throw new IllegalArgumentException("max has to be >= min");
+
+            MinMaxDouble minMaxY = getMinMaxYAxis();
+            for (int i=0; i<pts.size(); i++)
+                pts.set(i, new Pt(pts.get(i).x, ( (pts.get(i).y - minMaxY.getMin()) / minMaxY.getDistance()) * (max-min) + min) );
+        }
+
+        @Override
+        public MinMaxDouble getMinMaxXAxis() {
+            if (pts.isEmpty())
+                return new MinMaxDouble(0, 0);
+
+            double min = Double.POSITIVE_INFINITY, max = Double.NEGATIVE_INFINITY;
+            for (Pt pt : pts) {
+                if (pt.x < min)
+                    min = pt.x;
+                if (pt.x > max)
+                    max = pt.x;
+            }
+            return new MinMaxDouble(min, max);
+        }
+
+        @Override
+        public MinMaxDouble getMinMaxYAxis() {
+            if (pts.isEmpty())
+                return new MinMaxDouble(0, 0);
+
+            double min = Double.POSITIVE_INFINITY, max = Double.NEGATIVE_INFINITY;
+            for (Pt pt : pts) {
+                if (pt.y < min)
+                    min = pt.y;
+                if (pt.y > max)
+                    max = pt.y;
+            }
+            return new MinMaxDouble(min, max);
         }
 
         @Override

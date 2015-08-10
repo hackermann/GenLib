@@ -28,20 +28,22 @@ import genlib.abstractrepresentation.GenObject.AttributeType.Recommended;
 import genlib.abstractrepresentation.GenObject.AttributeType.Type;
 import genlib.utils.NamingConvention;
 import genlib.utils.Utils;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
 /**
  * This is the abstract object, every genetic Object of this library should
  * inherit from. It defines basic functionality for a string-output (toString)
- * and equals-Check (equals). If a subclass has a special equals-behavior, that
- * cannot been modelled with this class, so just overwrite equals () again.
- * The toString() is final here. If there is a need for individual string-output,
- * use user-defined methods, as example getName(), ..
+ * and equals-Check (equals). Additionaly, every GenObject is serializable.
+ * If a subclass has a special equals-behavior, that cannot been modelled with
+ * this class, so just overwrite equals () again. The toString() is final here.
+ * If there is a need for individual string-output, use user-defined methods,
+ * as example getName(), ..
  *
  * @author Hilmar
  */
-public abstract class GenObject {
+public abstract class GenObject implements Serializable {
 
     /**
      * gets all the attributes of the instance. Every Attribute has a type,
@@ -203,7 +205,7 @@ public abstract class GenObject {
     /**
      * defines the type of an attribute of a class
      */
-    public static class AttributeType extends GenObject {        
+    public static class AttributeType extends GenObject {
 
         /**
          * defines the basic type: HierarchicalParent and HierarchicalChild are reserved
@@ -281,7 +283,7 @@ public abstract class GenObject {
         public Recommended getRecommendedEqualsCheck () {
             return recommendedEqualsCheck;
         }
-        
+
         @Override
         public List<Attribute> getAttributes() {
             return Utils.createList(new Attribute(new AttributeType(Type.MainAttribute), "type", type),

@@ -30,7 +30,7 @@ package genlib.abstractrepresentation;
  *
  * @author Hilmar
  */
-public interface FitnessOp {
+public interface FitnessOp extends Operator {
 
     /**
      * the actual operator
@@ -40,21 +40,5 @@ public interface FitnessOp {
      * @return the calculated fitness-values
      */
     public double fitnessOp (GenInstance input, AlgorithmStep step);
-
-    /**
-     * is this operator compatible with the type of this phenoType
-     *
-     * @param representation the type of a phenoType
-     * @return true, if it is compatible
-     */
-    public boolean isCompatible(GenRepresentation representation);
-
-    /**
-     * is this operator compatible with this environment (the algorithmPass)
-     *
-     * @param algorithmPass the environment
-     * @return true, if it is compatible
-     */
-    public boolean isCompatible(AlgorithmPass algorithmPass);
 
 }

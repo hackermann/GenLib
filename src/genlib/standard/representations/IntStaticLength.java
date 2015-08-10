@@ -125,7 +125,7 @@ public class IntStaticLength extends AnyLongStaticLength {
         public IntStaticLengthInstance(IntStaticLength _parent, int ... _array) {
             super(_parent);
 
-            if (_array.length != _parent.getLength())
+            if (_array == null || _array.length != _parent.getLength())
                 throw new IllegalArgumentException("length of array not as expected, is: " + _array.length + ", expected: " + _parent.getLength());
 
             array = new int[_array.length];

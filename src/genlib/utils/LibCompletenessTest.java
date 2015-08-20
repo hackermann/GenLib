@@ -31,6 +31,8 @@ import genlib.abstractrepresentation.GenObject.AttributeType;
 import genlib.abstractrepresentation.GenObject.AttributeType.Type;
 import genlib.abstractrepresentation.GeneticAlgorithm;
 import genlib.abstractrepresentation.GeneticAlgorithm.Individuum;
+import genlib.examples.DataAnalyzerExample;
+import genlib.examples.DataAnalyzerExample.ExampleCreateDataCallback;
 import genlib.examples.DistributionExampleExtended;
 import genlib.examples.DistributionExampleMinimal;
 import genlib.examples.DiversityExample;
@@ -48,6 +50,8 @@ import genlib.extended.diversity.HierarchicalDiversity;
 import genlib.output.Graph2DLogger;
 import genlib.output.Graph2DLogger.AxisType;
 import genlib.output.TextLogger.PopulationLogging;
+import genlib.output.gui.DataAnalyzer;
+import genlib.output.gui.DataAnalyzer.DataAnalyzerModel;
 import genlib.output.gui.Graph2D;
 import genlib.output.gui.Graph2D.Plot2DContinuousX;
 import genlib.output.gui.Graph2D.Plot2DDiscreteX;
@@ -237,6 +241,7 @@ public class LibCompletenessTest {
             noStandardConstructors.put(AndInstance.class, new AndInstance(new And(new BooleanStaticLength(1)), new BooleanStaticLengthInstance(new BooleanStaticLength(1), true)));
             noStandardConstructors.put(OrInstance.class, new OrInstance(new Or(new BooleanStaticLength(1)), new BooleanStaticLengthInstance(new BooleanStaticLength(1), true)));
             noStandardConstructors.put(HierarchicalDiversity.class, new HierarchicalDiversity(ReductionType.average(), new AverageDiversity()));
+            noStandardConstructors.put(DataAnalyzerModel.class, new DataAnalyzerModel(100, new ExampleCreateDataCallback(), 4));
 
             //All the special classes, who are no subclasses of GenObject
             Set <Class> ignoredClasses = new HashSet();
@@ -255,9 +260,12 @@ public class LibCompletenessTest {
             ignoredClasses.add(LibCompletenessTest.class);
             ignoredClasses.add(Graph2D.class);
             ignoredClasses.add(Main.class);
+            ignoredClasses.add(DataAnalyzer.class);
             ignoredClasses.add(CountingMap.class);
             ignoredClasses.add(DiversityExample.class);
             ignoredClasses.add(HierarchicalExample.class);
+            ignoredClasses.add(DataAnalyzerExample.class);
+            ignoredClasses.add(ExampleCreateDataCallback.class);
 
             for (Class cl : allClasses) {
                 if (    ignoredClasses.contains(cl) ||                      //ignored class, because it is no subclass of GenObject on purpose
